@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;
+      charset=windows-1252">
+    <title>Process History Developent</title>
+  </head>
+  <body>
+<font face="Verdana">
+
+
+<table border="1" width="100%">
+        <tbody>
+
+<tr>
+<td>P</td>
+<td><b>Feature</b></td><td><b> Progress</b></td>
+<td><b>Tested XP</b></td>
+<td><b>Tested 7</b></td>
+
+
+<tr>
+
+<tr ><td>2</td><td  bgcolor="#0000FF"> BUG: Rewrite logger - only record processes to database when they end</td><td> Rewrite so putting minimal info in collection & test<br>less object oriented</td><td bgcolor="#FF0000">No</td><td>No</td></tr>
+
+<tr ><td>5</td><td> Command Line</td><td > *reinstate viewer code<br>*deallocate memory - process hacker interface<br> *inserting wide string into SQLite database, wide string Fix: sqlitebind16</td><td bgcolor="#FF0000">No</td><td bgcolor="#00FF00">Partial</td></tr> <br>
+
+<tr ><td>1</td><td  bgcolor="#0000FF"> BUG: missing processes</td><td>*refresh interval, user configured - reuse setup <br> stop using COM for process start code <br> use wmi for process end - may still fail - compare to see whats ended </td><td bgcolor="#FF0000">No</td><td>No</td></tr>
+
+<tr ><td>3</td><td> Jump to processes rather than showing "No more processes"</td><td>Crashes when go beyond processes - debug </td><td bgcolor="#FF0000">No</td><td bgcolor="#00FF00">Partial</td></tr>
+<tr bgcolor="#00FF00"><td>Done</td><td>Jump to most recent process</td><td bgcolor="#00FF00">-</td><td bgcolor="#FF0000">No</td><td>Yes</td></tr>
+<tr bgcolor="#00FF00"><td>-</td><td> date/time drill down as can be slow once database reaches a few MB</td><td bgcolor="#00FF00">Fills with creation times when hour would be acceptable<br>could put index SQL and move db open/close outside loop for performance</td><td bgcolor="#FF0000">No</td><td bgcolor="#00FF00">Partial</td></tr>
+<tr ><td>4</td><td>  filter on Executable</td><td> most processes that end are user not system and filtering incl. drilldown <br> Doesn't filter - debug <br><b> user select filter</b> with file open dialog</td><td bgcolor="#FF0000">No</td><td bgcolor="#00FF00">Partial</td></tr>
+<tr ><td>Trivial</td><td> Keyboard left right arrow</td><td> Not hitting event handler<br>Debug - Event handler was fired in old version on work pc</td><td bgcolor="#FF0000">No</td><td bgcolor="#00FF00">Partial</td></tr>
+<tr><td>Trivial</td><td>Processes lifetime <1min, draw as 1 min<br>selectable </td><td>alter draw code, already attempted?</td><td>No</td><td>No</td></tr>
+<tr><td>Trivial</td><td>bug:Executable missing e.g. telnet win 7 <br></td><td>Check code in PHTimeIfo<td>No</td><td>No</td></tr>
+<tr><td>-</td><td>Process Hacker library</td><td>icons, version info,phshared: get user and executable to Reduce codebase</td><td>No</td><td>No</td></tr>
+</tbody>
+</table>
+
+<!--
+
+
+-->
+
+<br><br><b>Wish list</b><br>
+*speed up (pos. multithread, DirectX) drawing of timeline as it can be slower with lots of small processes<br>
+ * DLLHost, RunDLL COM would require more dev work, will be added if get time as aren't part Process Hacker library but part of the application <br> 
+ <br><br><b>more</b><br>
+*build guide on the website & about box like filezilla
+
+<br><br>
+</font></p>
+
+</body>
+</html>

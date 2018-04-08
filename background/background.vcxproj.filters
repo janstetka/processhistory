@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\background">
+      <UniqueIdentifier>{ed100282-ee63-4712-8813-312ed6ec33b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\PHLogger\DBTables.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PHLogger\log.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ProcessHistory\moduleload.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PHLogger\PHLogUser.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PHLogger\ProcessInfo.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PHLogger\Setup.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\phshared\Crc32Static.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sqlite\sqlite3.c">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\phshared\phshared.cpp">
+      <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PHLogger\main64.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="phacker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="phrefresh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\PHLogger\PHLogger.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PHLogger\PHLogUser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PHLogger\ProcessInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PHLogger\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="background.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon2.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="idr_main.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_date_time-vc120-mt-sgd-1_57.lib" />
+    <Library Include="..\..\processhacker-2.33-src\lib\lib64\ntdll.lib" />
+    <Library Include="..\..\processhacker-2.33-src\phlib\bin\Debug64\phlib.lib" />
+  </ItemGroup>
+</Project>

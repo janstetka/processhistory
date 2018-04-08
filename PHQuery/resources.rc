@@ -1,0 +1,258 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "c:\wtl\include\atlres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United Kingdom) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_KEY DIALOGEX 0, 0, 147, 74
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Key"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,90,7,50,14
+    CONTROL         IDB_START,IDC_STATIC,"Static",SS_BITMAP,7,7,17,15
+    CONTROL         IDB_STOP,IDC_STATIC,"Static",SS_BITMAP,7,27,17,15
+    CONTROL         IDB_PROCESS,IDC_STATIC,"Static",SS_BITMAP,7,47,17,15
+    LTEXT           "Start",IDC_STATIC,41,7,17,8
+    LTEXT           "Stop",IDC_STATIC,41,27,16,8
+    LTEXT           "Process",IDC_STATIC,41,47,26,8
+END
+
+IDD_ABOUT DIALOGEX 0, 0, 251, 83
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "About PH"
+FONT 10, "Arial", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,194,7,50,14
+    ICON            IDI_MAIN,IDC_STATIC,7,7,20,20,SS_REALSIZEIMAGE
+    LTEXT           "",IDC_ABOUT_TEXT,38,7,143,69
+END
+
+IDD_SETTINGS_DLG DIALOGEX 0, 0, 240, 50
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "User"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,183,29,50,14
+    PUSHBUTTON      "Button1",IDC_USER_BTN,183,7,50,14
+    LTEXT           "Static",IDC_USERNAME,7,7,129,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_KEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 140
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 67
+    END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 244
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "idr_main.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_STOP                BITMAP                  "stop.bmp"
+IDB_START               BITMAP                  "start.bmp"
+IDB_PROCESS             BITMAP                  "process.bmp"
+IDB_RUNNING             BITMAP                  "bitmap2.bmp"
+IDR_MAINFRAME           BITMAP                  "toolbar2.bmp"
+IDR_FILTER_TOOLBAR      BITMAP                  "bmp00001.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "PH"
+    BEGIN
+        MENUITEM "Executable...",               ID_PH_EXECUTABLE
+        MENUITEM "Export...",                   40104
+        MENUITEM SEPARATOR
+        MENUITEM "Key...",                      ID_VIEW_KEY
+        MENUITEM "About...",                    ID_HELP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Font...",                     ID_PH_FONT
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_FILE_EXIT
+    END
+END
+
+IDR_CONTEXT_MENU MENU
+BEGIN
+    POPUP "Context "
+    BEGIN
+        MENUITEM "Open containing folder",      40058
+        MENUITEM "Run",                         40059
+        MENUITEM "Run with command line",       ID_CONTEXT_RUNWITHCOMMANDLINE
+        MENUITEM SEPARATOR
+        MENUITEM "View details",                40055
+        MENUITEM SEPARATOR
+        MENUITEM "Go to End",                   ID_CONTEXT_GOTOEND
+        MENUITEM "Go to Start",                 ID_CONTEXT_GOTOSTART
+        MENUITEM SEPARATOR
+        MENUITEM "Set executable filter",       ID_CONTEXT_FILTEREXECUTABLE
+        MENUITEM "Set user filter",             ID_CONTEXT_SETUSERFILTER
+    END
+END
+
+IDR_DETAIL_CONTEXT_MENU MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "Copy Text",                   ID__COPYTEXT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_PLACEHOLDER
+    BUTTON      ID_BUTTON40069
+    SEPARATOR
+    BUTTON      ID_BUTTON40071
+    BUTTON      ID_BUTTON40070
+    BUTTON      ID_BUTTON40092
+END
+
+IDR_FILTER_TOOLBAR TOOLBAR 16, 16
+BEGIN
+    BUTTON      ID_EXEC_FILTER_COMBO
+    BUTTON      ID_PH_EXECUTABLE
+    SEPARATOR
+    BUTTON      ID_USERFILTER_COMBO
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "Process History"
+    ID_PANE_1               "Drill down Progress"
+    ID_PANE_2               "All or Start Stop"
+END
+
+STRINGTABLE
+BEGIN
+    ID_PLACEHOLDER          "Enter Date/Time\nEnter Query"
+    ID_BUTTON40069          "Query\nQuery"
+    ID_BUTTON40070          "Forward\nForward"
+    ID_BUTTON40071          "Back\nBack"
+END
+
+STRINGTABLE
+BEGIN
+    ID_BUTTON40092          "Most Recent\nMost Recent"
+    ID_BUTTON40093          "Clear Executable Filter\nClear Executable Filter "
+END
+
+#endif    // English (United Kingdom) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

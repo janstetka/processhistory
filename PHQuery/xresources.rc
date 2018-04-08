@@ -1,0 +1,248 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United Kingdom) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_KEY DIALOGEX 0, 0, 147, 74
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Key"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,90,7,50,14
+    CONTROL         106,IDC_STATIC,"Static",SS_BITMAP,7,7,17,15
+    CONTROL         105,IDC_STATIC,"Static",SS_BITMAP,7,27,17,15
+    CONTROL         107,IDC_STATIC,"Static",SS_BITMAP,7,47,17,15
+    LTEXT           "Start",IDC_STATIC,41,7,17,8
+    LTEXT           "Stop",IDC_STATIC,41,27,16,8
+    LTEXT           "Process",IDC_STATIC,41,47,26,8
+END
+
+IDD_ABOUT DIALOGEX 0, 0, 251, 83
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "About PH"
+FONT 10, "Arial", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,194,7,50,14
+    ICON            103,IDC_STATIC,7,7,20,20,SS_REALSIZEIMAGE
+    LTEXT           "",IDC_ABOUT_TEXT,38,7,143,69
+END
+
+IDD_PROCESS_DLG DIALOGEX 0, 0, 281, 127
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Process"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Done",IDOK,224,7,50,14
+    ICON            "",IDC_EXECUTABLE_ICON,8,9,20,20
+    EDITTEXT        IDC_PROCESS_DETAIL_TEXT,7,36,267,84,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+END
+
+IDD_SETTINGS_DLG DIALOGEX 0, 0, 240, 50
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "User"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,183,29,50,14
+    PUSHBUTTON      "Button1",IDC_USER_BTN,183,7,50,14
+    LTEXT           "Static",IDC_USERNAME,7,7,129,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_KEY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 140
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 67
+    END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 244
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
+    END
+
+    IDD_PROCESS_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 274
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 120
+    END
+
+    IDD_SETTINGS_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 233
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 43
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "idr_main.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_STOP                BITMAP                  "stop.bmp"
+IDB_START               BITMAP                  "start.bmp"
+IDB_PROCESS             BITMAP                  "process.bmp"
+IDB_RUNNING             BITMAP                  "bitmap2.bmp"
+IDB_BITMAP1             BITMAP                  "C:\\big files\\src\\PHQuery\\toolbar2.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "PH"
+    BEGIN
+        MENUITEM "User...",                     ID_PH_USER
+        MENUITEM "Key...",                      ID_VIEW_KEY
+        MENUITEM "About...",                    ID_HELP_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        ID_FILE_EXIT
+    END
+END
+
+IDR_CONTEXT_MENU MENU
+BEGIN
+    POPUP "Context "
+    BEGIN
+        MENUITEM "Open containing folder",      40058
+        MENUITEM "Run Selected",                40059
+        MENUITEM SEPARATOR
+        MENUITEM "View Process...",             40055
+        MENUITEM SEPARATOR
+        MENUITEM "Go to End",                   ID_CONTEXT_GOTOEND
+        MENUITEM "Go to Start",                 ID_CONTEXT_GOTOSTART
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_PLACEHOLDER
+    BUTTON      ID_BUTTON40069
+    SEPARATOR
+    BUTTON      ID_BUTTON40071
+    BUTTON      ID_BUTTON40070
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "Process History"
+END
+
+STRINGTABLE
+BEGIN
+    ID_PLACEHOLDER          "Enter Date/Time"
+    ID_BUTTON40069          "Query"
+    ID_BUTTON40070          "Right"
+    ID_BUTTON40071          "Left"
+END
+
+#endif    // English (United Kingdom) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

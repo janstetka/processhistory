@@ -1,0 +1,21 @@
+User-agent: *
+Disallow: /PH64.zip
+Disallow: /PH32.zip
+
+User-agent: bingbot
+Disallow: /
+
+User-agent:  MJ12bot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: Gluten Free Crawler
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
