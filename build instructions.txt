@@ -1,0 +1,17 @@
+Building Process History
+
+Checkout the sources from the sourceforge repository https://svn.code.sf.net/p/processhistory/code/trunk, it has the following dependencies
+
+Sqlite embedded database 3.?+ http://sqlite.org SQLite.c needs to be added to the project items
+nowide standalone: http://utf8everywhere.org
+Boost C++ 1.57+ http://boost.org - requires the multithreaded 64bit binaries for datetime, file(system) to be linked https://sourceforge.net/projects/boost/files/boost-binaries/
+Windows Template Library 9+ http://wtl.sf.net
+Process Hacker Library 2.33+ http://processhacker.sf.net - The latest version of Process Hacker requires the Windows 10 SDK https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+
+Tested on Visual Studio 2013 community+
+
+Set the additional include directories for the dependencies.
+
+Set the output folders according to your preference.
+
+NB: The latest version of the process hacker library requires changing the calling convention to __stdcall (/Gz) and altering the pre processor defintions to match the Process Hacker project
