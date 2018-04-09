@@ -40,30 +40,13 @@ void DrawLines(HDC hDC,RECT rcEvent,long lID)
 }
 
 /*text lines up with lhs of window*/
-
-LRESULT PHScroll::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+void PHScroll::DoPaint(CDCHandle dc)
 {
 	if (!phd._complete || _MemDC==NULL)
-		return 0;
-	
-	RECT r;
-	
-	r.top = 0;
-	r.left=0;
-	r.right = phd._Width;
-	r.bottom = phq._lCount * 42;;
+		return ;	
 
-	CPaintDC hDC2(m_hWnd);
-	hDC2.SetViewportOrg(-m_ptOffset.x, -m_ptOffset.y);
-
-	if (m_ptOffset.x == 0 && m_ptOffset.y==0)//TODO: Is this causing drawing problems?
-		r = hDC2.m_ps.rcPaint;
-
-	if(hDC2.BitBlt(r.left, r.top, r.right-r.left, r.bottom-r.top,
-		*_MemDC, r.left, r.top, SRCCOPY)==0)
+	if (dc.BitBlt(0, 0, phd._Width, phq._lCount * 41,*_MemDC, 0, 0, SRCCOPY)==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
-
-	return 0;
 }
 
 void PHScroll::CreateScreenBuffer()
@@ -81,6 +64,15 @@ void PHScroll::CreateScreenBuffer()
 	if (_MemDC->FillRect(&rPanel, FillBrush) == 0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 
+
+	/*TODO:  tidy up logic*/
+	/*Draw the processes*/
+	for (map<long, RECT>::iterator it = phd._ProcessAreas.begin(); it != phd._ProcessAreas.end(); it++)
+		DrawProcess(it->first, it->second);
+}
+
+void PHScroll::DrawProcess(long lID, RECT rcEvent)
+{
 	CFont hFont;
 	
 						 hFont.CreateFontIndirectA(&phd._font);
@@ -95,16 +87,6 @@ void PHScroll::CreateScreenBuffer()
 	CBrush SelectedBrush;
 	SelectedBrush.CreateSolidBrush (RGB(GetRValue(0x00CA6002),GetGValue(0x00CA6002),GetBValue(0x00606002)));
 	COLORREF old_txt = _MemDC->SetTextColor(0x00FFFFFF);
-		/*TODO:  tidy up logic*/
-	/*Draw the processes*/
-	for(map<long,RECT>::iterator it=phd._ProcessAreas.begin(); it!=phd._ProcessAreas.end(); it++)
-	{
-		long lID=it->first;
-
-		RECT rcEvent;
-		
-		rcEvent=it->second;
-
 		map<long,PHProcess>::iterator proc_it=		phq._Processes.find(lID);
 		PHProcess pclProcess=proc_it->second;
 					
@@ -188,13 +170,11 @@ void PHScroll::CreateScreenBuffer()
 			if(phd._selected==lID)
 				_MemDC->SetBkColor(sel_cr);
 		}			
-	}/*end process*/
-
-	_MemDC->SetTextColor(old_txt);
+_MemDC->SetTextColor(old_txt);
 	_MemDC->SetBkColor(old_cr);
 	_MemDC->SelectFont(oldFont);
 	hFont.DeleteObject();
-}
+	}/*end process*/
 
 #include <boost/filesystem.hpp>
 #include <mutex>

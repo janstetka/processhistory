@@ -161,11 +161,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_date_time-vc120-mt-sgd-1_57.lib" />
-    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_filesystem-vc120-mt-sgd-1_57.lib" />
-    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_system-vc120-mt-sgd-1_57.lib" />
     <Library Include="..\..\processhacker-2.33-src\lib\lib64\ntdll.lib" />
-    <Library Include="..\..\processhacker-2.33-src\phlib\bin\Debug64\phlib.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\PHQuery\bmp00001.bmp">

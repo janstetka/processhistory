@@ -19,12 +19,11 @@ public:
 		MESSAGE_HANDLER(WM_LBUTTONDOWN, OnLB)
 		 MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
 		 MESSAGE_HANDLER(WM_MOUSEMOVE,OnMouseMove)
-		 MESSAGE_HANDLER(WM_PAINT, OnPaint)
-		CHAIN_MSG_MAP(CScrollWindowImpl<PHScroll>);
+		 CHAIN_MSG_MAP(CScrollWindowImpl<PHScroll>);
 	END_MSG_MAP()
 
-	//void DoPaint(CDCHandle hDC);
-	LRESULT OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	void DoPaint(CDCHandle hDC);
+	
 	LRESULT OnRB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
 	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
 	LRESULT OnLB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -41,7 +40,7 @@ public:
 	}
 
 	void CreateScreenBuffer();
-
+	void DrawProcess(long lID, RECT rcEvent);
 	CMemoryDC* _MemDC;
 };
 
@@ -59,12 +58,11 @@ public:
 	DECLARE_WND_CLASS(NULL)
 	BEGIN_MSG_MAP(PHTimeInfo)
 		MESSAGE_HANDLER(WM_RBUTTONDOWN, OnRB)
-		MESSAGE_HANDLER(WM_PAINT, OnPaint)
 		CHAIN_MSG_MAP(CScrollWindowImpl<PHTimeInfo>);
 	END_MSG_MAP()
 
 	LRESULT OnRB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
-	LRESULT OnPaint(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	void DoPaint(CDCHandle dc);
 	
 	void CreateScreenBuffer();
 	void SetSize(SIZE);

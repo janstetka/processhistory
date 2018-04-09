@@ -15,38 +15,44 @@ extern PHDisplay phd;
 extern mutex db_mutex;
 mutex proc_det;
 
-LRESULT PHTimeInfo::OnPaint(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-{
 
-	if (!phd._complete || _MemDC == NULL)
-		return 0;
+void PHTimeInfo::DoPaint(CDCHandle hDC2)
+{
+	// query has not finished return 
+	if (!phd._complete )
+		return;
 	lock_guard<mutex> sl(proc_det);
-	CPaintDC hDC2(m_hWnd);
+	
+	// mouse not over a process and no process selected  - display problems in main view
 	if (phd._mouseover <= 0 && phd._selected <= 0)
 	{
-		RECT r;
-		r.left = r.top = 0;
-		r.right = _Width;
-		r.bottom = _Height;
-		COLORREF cr;
-		cr = 0x00FFFFFF;
+		if (_Width > 0 && _Height > 0)
+		{
+			// fill rectangle white
+			RECT r;
+			r.left = r.top = 0;
+			r.right = _Width;
+			r.bottom = _Height;
+			COLORREF cr;
+			cr = 0x00FFFFFF;
 
-		CBrush FillBrush;
-		FillBrush.CreateSolidBrush(cr);
-		if (hDC2.FillRect(&r, FillBrush) == 0)
-			PHTrace(Win32Error(), __LINE__, __FILE__);
-
+			CBrush FillBrush;
+			FillBrush.CreateSolidBrush(cr);
+			if (hDC2.FillRect(&r, FillBrush) == 0)
+				PHTrace(Win32Error(), __LINE__, __FILE__);
+		}
+		return;
 	}
+	// mouse over a process and no process selected draw with no _MemDC
 if ( phd._mouseover>0 && phd._selected<=0)
 	{
 	CFont hFont;
 
 	hFont.CreateFontIndirectA(&phd._font);
 	CFont oldFont = hDC2.SelectFont(hFont);
+	
 
-		if (_hIcon != NULL)
-			if (hDC2.DrawIcon(10, 5, _hIcon) == 0)
-				PHTrace(Win32Error(), __LINE__, __FILE__);
+		
 		string processinfo;
 
 			processinfo = _ps2;
@@ -57,6 +63,18 @@ if ( phd._mouseover>0 && phd._selected<=0)
 		r.bottom = 900;
 		if (hDC2.DrawText(processinfo.c_str(), processinfo.length(), &r, DT_CALCRECT) == 0)
 			PHTrace(Win32Error(), __LINE__, __FILE__);
+
+		// fill rectangle white
+		COLORREF cr;
+		cr = 0x00FFFFFF;
+
+		CBrush FillBrush;
+		FillBrush.CreateSolidBrush(cr);
+		if (hDC2.FillRect(&r, FillBrush) == 0)
+			PHTrace(Win32Error(), __LINE__, __FILE__);
+if (_hIcon != NULL)
+			if (hDC2.DrawIcon(10, 5, _hIcon) == 0)
+				PHTrace(Win32Error(), __LINE__, __FILE__);
 		r.bottom += 5;
 		r.right += 50;
 		r.left = 50;
@@ -72,25 +90,13 @@ if ( phd._mouseover>0 && phd._selected<=0)
 hDC2.SelectFont(oldFont);
 	hFont.DeleteObject();
 
-}
-else if (phd._selected > 0)
+}// else process selected draw from _MemDC 
+else if (phd._selected > 0 && _MemDC != NULL)
 {
-	RECT r;
-	r.top = 0;
-	r.left = 0;
-	r.right = _Width;
-	r.bottom = _Height;
-
-	hDC2.SetViewportOrg(-m_ptOffset.x, -m_ptOffset.y);
-
-	if (m_ptOffset.x == 0 && m_ptOffset.y == 0)
-		r = hDC2.m_ps.rcPaint;//TODO: Is this causing drawing problems?
-
-	if(hDC2.BitBlt(r.left, r.top, r.right - r.left, r.bottom - r.top,
-		*_MemDC, r.left, r.top, SRCCOPY)==0)
+	if(hDC2.BitBlt(0, 0, _Width, _Height,*_MemDC, 0, 0, SRCCOPY)==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 }
-	return 0;
+	return;
 }
 void PHTimeInfo::CreateScreenBuffer()
 {
@@ -109,9 +115,10 @@ void PHTimeInfo::CalculateRect()
 	rPanel.right = _Width;
 	rPanel.bottom = _Height;
 
-	if (!_MemDC)
+	if (_MemDC)
+		delete _MemDC;
 		_MemDC = new CMemoryDC(GetDC(), rPanel);
-
+	
 	CFont hFont;
 
 	if(hFont.CreateFontIndirectA(&phd._font)==NULL)
@@ -149,10 +156,9 @@ void PHTimeInfo::DrawMemDC()
 		rPanel.right = _Width;
 		rPanel.bottom = _Height;
 		if (_MemDC)
-		{
 			delete _MemDC;
-			_MemDC = new CMemoryDC(GetDC(), rPanel);
-		}
+		_MemDC = new CMemoryDC(GetDC(), rPanel);
+		
 		COLORREF cr;
 		cr = 0x00FFFFFF;
 	
@@ -196,8 +202,9 @@ void PHTimeScale::CalcTimeScale()
 	rPanel.left = rPanel.top = 0;
 	rPanel.right = phd._Width;
 	rPanel.bottom = _HeightTimeLine;
-	if (!_MemDC)
-		_MemDC = new CMemoryDC(GetDC(), rPanel);
+	if (_MemDC)
+		delete _MemDC;
+	_MemDC = new CMemoryDC(GetDC(), rPanel);
 	CFont hFont;
 
 	hFont.CreateFontIndirectA(&phd._font);
@@ -443,23 +450,17 @@ void PHTimeInfo::DisplayInfo()
 		d.s = _ps2;
 		dispcache.insert(pair<long, dcs>(phd._mouseover, d));*/
 	}
-	SIZE sz;
+	/*SIZE sz;
 	sz.cx=1;
 	sz.cy=150;
-	SetSize(sz);
+	SetSize(sz);*/
 }
 LRESULT PHTimeScale::OnPaint(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+	CPaintDC hDC(m_hWnd);
 	if (!phd._complete || _MemDC == NULL)
 		return TRUE;
-
-	CPaintDC hDC(m_hWnd);
-
-	RECT r = hDC.m_ps.rcPaint;
-
-		if(hDC.BitBlt(r.left, r.top, r.right - r.left, r.bottom - r.top,
-		*_MemDC, r.left, r.top, SRCCOPY)==0)
+	
+	if (hDC.BitBlt(0, 0, phd._Width, _HeightTimeLine,*_MemDC, 0, 0, SRCCOPY)==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
-
-	return TRUE;
 }

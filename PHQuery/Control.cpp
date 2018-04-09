@@ -235,11 +235,6 @@ m_sBar.SetPaneText(ID_PANE_2, "ALL" );
 	if(phts.Create(m_wndHorzSplit2, rcDefault, "Time Scale", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, WS_EX_CLIENTEDGE)==NULL)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 	
-	DWORD dwScrollExStyle=phs.GetScrollExtendedStyle();
-	dwScrollExStyle &= ~SCRL_ERASEBACKGROUND;
-	phs.SetScrollExtendedStyle(dwScrollExStyle);
-	/*phti.SetScrollExtendedStyle(dwScrollExStyle);*/
-	
 	ph_instance._hWndResults=phs.m_hWnd;
 
 	m_wndHorzSplit.SetSplitterPanes(phs, m_wndHorzSplit2);
@@ -248,6 +243,7 @@ m_sBar.SetPaneText(ID_PANE_2, "ALL" );
 	m_wndHorzSplit.SetDefaultActivePane(phs);
 	UpdateLayout();
 	m_wndHorzSplit.SetSplitterPosPct(75);
+	m_wndHorzSplit2.SetSplitterPosPct(25);
 
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
    
@@ -560,7 +556,6 @@ LRESULT CMainFrame::OnProcessViewSelected(WORD /*wNotifyCode*/, WORD /*wID*/, HW
 		sz.cy=phti._Height;
 		phti.SetSize(sz);
 		phd._mouseover = -1;
-		//m_wndHorzSplit.SetSplitterPosPct(85);
 	}
 	phs.SetFocus();
 	return 0;
@@ -829,9 +824,6 @@ LRESULT CMainFrame::OnFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/,
 	}
 	return 0;
 }
-// ++ right click view details sorts display corruption 
-// ++ mouseover doesn't work until select/deselect, something to do with not drawing phtimeinfo at all?
-
 //  UI- progress bar  - clk progress to cancel?
 
 //  manual control of refresh rate -  

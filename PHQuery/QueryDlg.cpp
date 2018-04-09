@@ -79,37 +79,32 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 {
 	if (wParam == 4)//rh mouse not found
 	{
-		RECT r;
-		r.top = 5;
-		r.bottom = phti._Height;
-		r.left = 0;
-		r.right = phti._Width;
+		if (phti._MemDC != NULL)
+		{
+			RECT r;
+			r.top = 5;
+			r.bottom = phti._Height;
+			r.left = 0;
+			r.right = phti._Width;
 
-		COLORREF cr;
-		cr = 0x00FFFFFF;
+			COLORREF cr;
+			cr = 0x00FFFFFF;
 
-		CBrush FillBrush;
-		FillBrush.CreateSolidBrush(cr);
-		if (phti._MemDC->FillRect(&r, FillBrush) == 0)
-			PHTrace(Win32Error(), __LINE__, __FILE__);
-		if(phti.InvalidateRect(&r, FALSE)==0)
-		PHTrace(Win32Error(), __LINE__, __FILE__);
-		if(phti.UpdateWindow()==0)
-		PHTrace(Win32Error(), __LINE__, __FILE__);
+			CBrush FillBrush;
+			FillBrush.CreateSolidBrush(cr);
+			if (phti._MemDC->FillRect(&r, FillBrush) == 0)
+				PHTrace(Win32Error(), __LINE__, __FILE__);
+			if (phti.InvalidateRect(&r, FALSE) == 0)
+				PHTrace(Win32Error(), __LINE__, __FILE__);
+			if (phti.UpdateWindow() == 0)
+				PHTrace(Win32Error(), __LINE__, __FILE__);
+		}
 	
-		//RECT r;
-		//::GetWindowRect(m_hWnd, &r);
-		//m_wndHorzSplit.SetSplitterPos((int)(((float)r.bottom / 10)*7.5));
-		m_wndHorzSplit.m_cxyMin = phts._HeightTimeLine;
-		SIZE s;
-		s.cy = s.cx = 1;
-		phti.SetSize(s);
 		return 0;
 	}
 
 	if (wParam == 2)//mouseover found
 	{
-		//m_wndHorzSplit.SetSplitterPosPct(80);
 		if (phd._mouseover > 0)
 		{
 			phti.DisplayInfo();
@@ -119,7 +114,6 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 		r.top = 5;
 		r.bottom = phti._Height;
 		r.left = 0;
-		//r.right = phti._Width;
 		
 			r.right = phd._Width;
 		if(phti.InvalidateRect(&r,TRUE)==0)
@@ -128,11 +122,6 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 		}
 	
-		//RECT rwin;
-		//::GetWindowRect(m_hWnd, &rwin);
-		//m_wndHorzSplit.SetSplitterPos(rwin.bottom - phti._Height);
-		//m_wndHorzSplit.m_cxyMin = phti._Height+phts._HeightTimeLine;
-		//m_wndHorzSplit2.m_cxyMin = phti._Height;
 		return 0;
 	}
 	if (wParam == 3)//mouseover gone into whitespace
@@ -148,13 +137,6 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 		if(phti.UpdateWindow()==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 
-		//RECT r;
-		//::GetWindowRect(m_hWnd, &r);
-		//m_wndHorzSplit.SetSplitterPos((int)(((float)r.bottom / 10)*7.5));
-		m_wndHorzSplit.m_cxyMin = phts._HeightTimeLine;
-		SIZE s;
-		s.cy = s.cx = 1;
-		phti.SetSize(s);
 		return 0;
 	}
 
@@ -176,8 +158,8 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 	phs.SetSize(s);
 	s.cy =s.cx= 1;
 	phti.SetSize(s);
-	if(phs.Invalidate()==0)
-	PHTrace(Win32Error(), __LINE__, __FILE__);
+	//if(phs.Invalidate()==0)
+	//PHTrace(Win32Error(), __LINE__, __FILE__);
 	if(phti.Invalidate()==0)
 	PHTrace(Win32Error(), __LINE__, __FILE__);
 	if(phs.UpdateWindow()==0)
@@ -196,10 +178,6 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 	}
 
 	//work_mtx.unlock();
-	//m_wndHorzSplit.SetSplitterPosPct(95);//could work out actual height here
-	//RECT r;
-	//::GetWindowRect(m_hWnd, &r);
-	//m_wndHorzSplit.SetSplitterPos((int)(((float)r.bottom / 10)*7.5));
-	//m_wndHorzSplit.m_cxyMin = phti._HeightTimeLine;
+	
 	return 0;
 }

@@ -126,6 +126,7 @@
       <ProgramDatabaseFile>$(OutDir)ProcessHistory.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>gdiplus.lib;version.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\local\boost_1_57_0\lib64-msvc-12.0\;C:\processhacker-2.33-src\phlib\bin\Debug64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,22 +151,22 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\boost_1_51_0\boost_1_51_0;c:\wtl\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>c:\wtl\include\;C:\boost_1_57_0\boost_1_57_0;..\background\nowide_standalone\;C:\processhacker-2.33-src\phlib\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_WTL_NO_CSTRING;_WTL_NO_WTYPES</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gdiplus.lib;version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gdiplus.lib;version.lib;C:\processhacker-2.33-src\phlib\bin\Release64\phlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)\ProcessHistory.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>false</OptimizeReferences>
-      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\local\boost_1_57_0\lib64-msvc-12.0\;C:\processhacker-2.33-src\phlib\bin\Release64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -217,11 +218,7 @@
     <ResourceCompile Include="..\PHQuery\resources.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_date_time-vc120-mt-sgd-1_57.lib" />
-    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_filesystem-vc120-mt-sgd-1_57.lib" />
-    <Library Include="..\..\local\boost_1_57_0\lib64-msvc-12.0\libboost_system-vc120-mt-sgd-1_57.lib" />
     <Library Include="..\..\processhacker-2.33-src\lib\lib64\ntdll.lib" />
-    <Library Include="..\..\processhacker-2.33-src\phlib\bin\Debug64\phlib.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\PHQuery\bmp00001.bmp" />
