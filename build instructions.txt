@@ -1,6 +1,6 @@
 Building Process History
 
-Checkout the sources from the sourceforge repository https://svn.code.sf.net/p/processhistory/code/trunk, it has the following dependencies
+Get the sources from the github repository, it has the following dependencies
 
 Sqlite embedded database 3.?+ http://sqlite.org SQLite.c needs to be added to the project items
 nowide standalone: http://utf8everywhere.org
