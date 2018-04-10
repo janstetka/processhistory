@@ -24,26 +24,21 @@
         <a href="#Requirements">Requirements</a><br>
         <br>
         <strong>Logging processes</strong>&nbsp; </font></p>
-    <p><font face="Verdana">Create a user account from the PH menu |
-        User... in Process History. This means that PH will now log your
-        processes when it is running. You can delete your user the same
-        way.</font></p>
-    <p><font face="Verdana"><font color="blue">ProcessHistory.exe should be
+    
+    <p><font face="Verdana"><font color="blue">ProcessHistory.exe can be
           started</font> <b>and left running</b> for the period that
         you want to record process usage. Only processes ending whilst
-        PH is running will be captured. Only one instance of ProcessHistory.exe must be run at a time.<br>
+        PH is running will be captured. <br>
       </font></p>
     <p><font face="Verdana">NB: ProcessHistory.exe needs to be run as
-        administrator.  <br>
+        administrator to monitor all processes.  <br>
         <br>
         <a name="Making_a_Query"></a><b>Making a Query</b> <br>
       </font> </p>
     <p><font face="Verdana">The viewer shows you a blank white window
         when it is started.</font></p>
     <font face="Verdana">Enter the date and time in the field on the
-      tool bar to search for <font face="Verdana"> processes</font>. If
-      no processes were logged at that time PH try a broader query - see
-      video.</font><font face="Verdana"><br>
+      tool bar to search for <font face="Verdana"> processes</font>. </font><font face="Verdana"><br>
       The time must be in the format <font color="blue">YYYY-MM-DD
         HH:MM </font>( 24 hour clock ) </font><font face="Verdana">Preceding
 
@@ -51,40 +46,18 @@
 
       zeros for one digit numbers e.g. 13:01 for one minute and one
       second past 1 pm. </font>
-    <p><font face="Verdana">If you are unsure of the exact time: Enter a
+    <p><font face="Verdana">You can enter a
         year, press return or click the query button </font><font
         face="Verdana"><font face="Verdana"><img
             src="qrybtn.jpg"> </font>and select
-        a result in the drop down list, and repeat with the month and
-        day. As shown in this video:<br>
+        a result in the drop down list, or month or
+        day. <br>
       </font></p>
-    <p> <object id="FlashID"
-        classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-        height="238" width="569"> <param name="movie" value="Q1.swf"> <param
-          name="quality" value="high"> <param name="wmode"
-          value="opaque"> <param name="swfversion" value="6.0.65.0">
-        <!-- This param tag prompts users with Flash Player 6.0 r65 and higher to download the latest version of Flash Player. Delete it if you don’t want users to see the prompt. -->
-        <param name="expressinstall" value="Scripts/expressInstall.swf">
-        <!-- Next object tag is for non-IE browsers. So hide it from IE using IECC. -->
-        <!--[if !IE]>--> <object type="application/x-shockwave-flash"
-          data="Q1.swf" height="238" width="569">
-          <!--<![endif]--> <param name="quality" value="high"> <param
-            name="wmode" value="opaque"> <param name="swfversion"
-            value="6.0.65.0"> <param name="expressinstall"
-            value="Scripts/expressInstall.swf">
-          <!-- The browser displays the following alternative content for users with Flash Player 6.0 and older. -->
-          <div>
-            <h4>Content on this page requires a newer version of Adobe
-              Flash Player.</h4>
-            <p><a href="http://www.adobe.com/go/getflashplayer"><img
-src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
-                  alt="Get Adobe Flash player" height="33" width="112"></a></p>
-          </div>
-          <!--[if !IE]>--> </object>
-        <!--<![endif]--> </object> </p>
+    
     <p><font face="Verdana"> <font color="blue">Click the Query button</font>
         <img src="qrybtn.jpg"> on the toolbar to display the results. <br>
-		If you want to limit the results across any time period by executable. Click File | Executable... Select the executable query the time period. If you wish to remove the filter click the <b>X</b> on the toolbar
+		To limit the results across any time period by executable. Click File | Executable... or click the button on the toolbar or enter an executable path in the adjacent field. If you wish to remove the filter clear the text in the field on the toolbar<br>
+		To limit the results by user across any time period select the user from the drop down list
         <br><br>
         <b>Date and time results.</b><br>
       </font><br>
@@ -93,26 +66,30 @@ src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
         options on the context menu. <br>
         <br>
         - Select <font color="blue">View ...</font> to view the
-        process. Information displayed is Path, (total) duration, begin
+        process. Information displayed is Path, duration, begin
         and end times,
         command line, user and whether this is a 32/64bit
         executable. <br>
         A CRC (Cyclic Redundancy Check) of the executable is shown from
         the time that it executed</font><font face="Verdana">. This is a
-        unique summarisation of the executable that is useful for
-        tracking when changes occur.<br>
+        unique summarisation of the executable.<br>
+		This information is also available when the mouse pointer is over the process. It can be copied to the clipboard by right clicking.<br>
         - Click <font color="blue">Run selected</font> to run the
         executable of the process.<br>
+		- Click <font color="blue">Run with command line</font> to run the
+        executable of the process with the command line it was run with.<br>
         <font color="blue">- Open containing folder </font><font
           color="black">to navigate to the executable in the file
           system.</font><br>
         - Click <font color="blue">goto begin/ goto end</font> to
         navigate to the start/end of the process.<br>
-		- Click Set Executable Filter to limit the results by executable</font></p>
+		- Click Set Executable Filter to limit the results by processes executable<br>
+		- Click Set User Filter to limit the results by this processes user<br></font></p>
     <p><font face="Verdana">Press <font color="blue"> left or right arrow on the keyboard, or
           the left/right buttons on the toolbar </font>to navigate back
         or forward to the previous/later processes have been recorded. If there is a gap between the recorded processes PH will find the processes after the gap. 
-		Press <b> ->| </b> on the toolbar to go to the most recently recorded processes.</font></p>
+		Press <b> ->| </b> on the toolbar to go to the most recently recorded processes.<br>
+		Double click on the third pane of the status bar to toggle between ALL processes or those BEGINning/ENDing in the time period </font></p>
     <p><font face="Verdana">A key is available on the PH Menu.</font></p>
     <font face="Verdana">
       <!--   <font face="Verdana">
@@ -154,23 +131,10 @@ PH will continue to support being run on Windows XP SP3 after Microsofts officia
                                           face="Verdana">32 bit logger
                                           will log only 32 bit processes
                                           running on 32 &amp; 64 bit
-                                          windows.</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><br>
+                                          windows and is no longer updated.</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><br>
         </font> </p>
 <br>
-Need more help, please leave a comment below
-    <div id="disqus_thread"></div>
-    <script type="text/javascript">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = 'processhistorydoc'; // required: replace example with your forum shortname
 
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function() {
-            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     
 
       <script type="text/javascript">
