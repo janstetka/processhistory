@@ -111,7 +111,7 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 		
 		r.right = phti._Width;
 		if(phti.InvalidateRect(&r,TRUE)==0)
-		PHTrace(Win32Error(), __LINE__, __FILE__);
+			PHTrace(Win32Error(), __LINE__, __FILE__);
 		if(phti.UpdateWindow()==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 		}
@@ -122,22 +122,16 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 	{
 		RECT r;
 		r.top = 0;
-		r.bottom = phti._Height;
+		r.bottom = 1;
 		r.left = 0;
-		r.right = phti._Width;
-		COLORREF cr;
-		cr = 0x00FFFFFF;
-
-		CBrush FillBrush;
-		FillBrush.CreateSolidBrush(cr);
-		if (phti._MemDC->FillRect(&r, FillBrush) == 0)
-		PHTrace(Win32Error(), __LINE__, __FILE__);
-		if(phti.InvalidateRect(&r,FALSE)==0)
-		PHTrace(Win32Error(), __LINE__, __FILE__);
+		r.right = 1;
+		if (phti._MemDC != NULL)
+			delete phti._MemDC;
+		phti._MemDC = new  CMemoryDC(GetDC(), r);		
+		
 		if(phti.UpdateWindow()==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
-		//if (phti._MemDC != NULL)
-		//	delete phti._MemDC; 
+		
 		SIZE s;
 		s.cy = s.cx = 1;
 		phti.SetSize(s);
