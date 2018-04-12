@@ -13,85 +13,15 @@ using namespace boost;
 extern PHQuery phq;
 extern PHDisplay phd;
 extern mutex db_mutex;
-mutex proc_det;
-
 
 void PHTimeInfo::DoPaint(CDCHandle hDC2)
 {
 	// query has not finished return 
 	if (!phd._complete )
 		return;
-	lock_guard<mutex> sl(proc_det);
 	
-	// mouse not over a process and no process selected  - display problems in main view
-	if (phd._mouseover <= 0 && phd._selected <= 0)
-	{
-		if (_Width > 0 && _Height > 0)
-		{
-			// fill rectangle white
-			RECT r;
-			r.left = r.top = 0;
-			r.right = _Width;
-			r.bottom = _Height;
-			COLORREF cr;
-			cr = 0x00FFFFFF;
-
-			CBrush FillBrush;
-			FillBrush.CreateSolidBrush(cr);
-			if (hDC2.FillRect(&r, FillBrush) == 0)
-				PHTrace(Win32Error(), __LINE__, __FILE__);
-		}
-		return;
-	}
-	// mouse over a process and no process selected draw with no _MemDC
-if ( phd._mouseover>0 && phd._selected<=0)
-	{
-	CFont hFont;
-
-	hFont.CreateFontIndirectA(&phd._font);
-	CFont oldFont = hDC2.SelectFont(hFont);
-	
-
-		
-		string processinfo;
-
-			processinfo = _ps2;
-		RECT r;
-		r.left = 0;
-		r.right = 1600;
-		r.top = 0;
-		r.bottom = 900;
-		if (hDC2.DrawText(processinfo.c_str(), processinfo.length(), &r, DT_CALCRECT) == 0)
-			PHTrace(Win32Error(), __LINE__, __FILE__);
-
-		// fill rectangle white
-		COLORREF cr;
-		cr = 0x00FFFFFF;
-
-		CBrush FillBrush;
-		FillBrush.CreateSolidBrush(cr);
-		if (hDC2.FillRect(&r, FillBrush) == 0)
-			PHTrace(Win32Error(), __LINE__, __FILE__);
-if (_hIcon != NULL)
-			if (hDC2.DrawIcon(10, 5, _hIcon) == 0)
-				PHTrace(Win32Error(), __LINE__, __FILE__);
-		r.bottom += 5;
-		r.right += 50;
-		r.left = 50;
-		r.top = 5;
-		
-		_Height = r.bottom;
-				
-			_Width = phd._Width;
-
-		if (hDC2.DrawText(processinfo.c_str(), processinfo.length(), &r, DT_LEFT | DT_VCENTER) == 0)
-				PHTrace(Win32Error(), __LINE__, __FILE__);
-	
-hDC2.SelectFont(oldFont);
-	hFont.DeleteObject();
-
-}// else process selected draw from _MemDC 
-else if (phd._selected > 0 && _MemDC != NULL)
+	//  process selected draw from _MemDC 
+if ( _MemDC != NULL)
 {
 	if(hDC2.BitBlt(0, 0, _Width, _Height,*_MemDC, 0, 0, SRCCOPY)==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
@@ -100,9 +30,9 @@ else if (phd._selected > 0 && _MemDC != NULL)
 }
 void PHTimeInfo::CreateScreenBuffer()
 {
-	_Width = _Height = 100;
+	_Width = _Height = 1;
 	phd._process_detail = false;
-	lock_guard<mutex> sl(proc_det);
+
 	CalculateRect();
 	DrawMemDC();
 
@@ -125,19 +55,12 @@ void PHTimeInfo::CalculateRect()
 		PHTrace(Win32Error(), __LINE__, __FILE__);;
 	CFont oldFont = _MemDC->SelectFont(hFont);
 
-	if (phd._selected > 0)
-	{
-
-		string processinfo;
-
-			processinfo = _ps;
-
 		RECT r;
 		r.left = 0;
 		r.right = 1600;
 		r.top = 0;
 		r.bottom = 900;
-		if (_MemDC->DrawText(processinfo.c_str(), processinfo.length(), &r, DT_CALCRECT) == 0)
+		if (_MemDC->DrawText(_ps.c_str(), _ps.length(), &r, DT_CALCRECT) == 0)
 			PHTrace(Win32Error(), __LINE__, __FILE__);
 		r.bottom += 5;
 		r.right += 50;
@@ -145,7 +68,6 @@ void PHTimeInfo::CalculateRect()
 		_Height = r.bottom;
 		_Width = r.right;
 
-	}
 	_MemDC->SelectFont(oldFont);
 	hFont.DeleteObject();
 }
@@ -172,7 +94,7 @@ void PHTimeInfo::DrawMemDC()
 
 		if (_MemDC->FillRect(&rPanel, FillBrush) == 0)
 			PHTrace(Win32Error(), __LINE__, __FILE__);
-		string processinfo = _ps;
+
 		if (_hIcon != NULL)
 			if (_MemDC->DrawIcon(10, 5, _hIcon) == 0)
 				PHTrace(Win32Error(), __LINE__, __FILE__);
@@ -183,7 +105,7 @@ void PHTimeInfo::DrawMemDC()
 			r.right = _Width;
 		r.bottom = _Height;
 
-		if (_MemDC->DrawText(processinfo.c_str(), processinfo.length(), &r, DT_LEFT | DT_VCENTER) == 0)
+		if (_MemDC->DrawText(_ps.c_str(), _ps.length(), &r, DT_LEFT | DT_VCENTER) == 0)
 			PHTrace(Win32Error(),__LINE__,__FILE__);		
 	
 	_MemDC->SelectFont(oldFont);
@@ -288,39 +210,11 @@ void PHTimeScale::DrawTimeAxis()
 	hFont.DeleteObject();
 }
 
-/*struct dcs
-{
-	string s;
-	HICON hi;
-} ;
-map<long, dcs> dispcache;*///DONE: put this back how it was before 
-
 void PHTimeInfo::DisplayInfo()
 {
 	if (!phd._complete)
 		return;
 
-	/*if (phd._selected > 0)//can't rely on this as mouse is hovering over process when right click
-	{
-		map<long, dcs>::iterator it = dispcache.find(phd._mouseover);
-		if (it != dispcache.end())
-		{
-			_ps = it->second.s;
-			_hIcon = it->second.hi;
-			return;
-		}
-	}
-	else if (phd._mouseover > 0)
-	{
-		
-		map<long, dcs>::iterator it = dispcache.find(phd._mouseover);
-		if (it != dispcache.end())
-		{
-			_ps2 = it->second.s;
-			_hIcon = it->second.hi;
-			return;
-		}
-	}*/
 	sqlite3_stmt* stmt,*stmt2;
 	string pathtxt,cltxt,usertxt;
 	string Product,Description;
@@ -328,13 +222,13 @@ void PHTimeInfo::DisplayInfo()
 	PHProcess pclProcess;
 	time_duration ProcessDuration;
 	unsigned long CRC;
-
+	 if (phd._mouseover>0)
+		_ID=phd._mouseover;
 	
 	map<long, long>::iterator pit;
-	if (phd._selected>0)//can't rely on this as mouse is hovering over process when right click
+
 		pit= phq._PData.find(_ID);	
-	else if (phd._mouseover>0)
-		pit = phq._PData.find(phd._mouseover);
+
 	if(pit!=phq._PData.end())
 	{
 		lock_guard<mutex> sl(db_mutex);
@@ -343,10 +237,9 @@ void PHTimeInfo::DisplayInfo()
 		ostringstream os;
 		os <<
 			"SELECT CommandLine FROM Process  JOIN CommandLines ON Process.clid=CommandLines.ID WHERE Process.ID=";
-		if (phd._mouseover < 1)
+		
 			os << _ID;
-		else
-			os << phd._mouseover;
+		
 			os<<";";
 		if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
 			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
@@ -361,10 +254,9 @@ void PHTimeInfo::DisplayInfo()
 		sqlite3_close(db);
 		ostringstream os2;
 		os2 << "SELECT UserName,CRC FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= ";
-		if (phd._selected > 0)
+
 			os2 << _ID;
-		else if(phd._mouseover>0)
-			os2 << phd._mouseover;		
+
 		os2 << ";";
 		sqlite3 *db2=OpenDB();
 		if(sqlite3_prepare(db2,os2.str().c_str(),-1,&stmt2,NULL)!=SQLITE_OK)
@@ -380,10 +272,9 @@ void PHTimeInfo::DisplayInfo()
 		sqlite3_finalize(stmt2);
 		sqlite3_close(db2);
 		map<long, string>::iterator qpit;
-		if (phd._selected>0)
+
 		 qpit=phd.qrypaths.find(_ID);
-		else if (phd._mouseover>0)
-			qpit = phd.qrypaths.find(phd._mouseover);
+
 
 		if(qpit!=phd.qrypaths.end())
 		{
@@ -408,10 +299,9 @@ void PHTimeInfo::DisplayInfo()
 		}
 		
 		map<long, PHProcess>::iterator proc_it;
-		if (phd._selected>0)
+
 		 proc_it=		phq._Processes.find(_ID);
-		else if (phd._mouseover>0)
-			proc_it = phq._Processes.find(phd._mouseover);
+
 		if(proc_it!=phq._Processes.end())
 		{
 			pclProcess=proc_it->second;
@@ -434,26 +324,9 @@ void PHTimeInfo::DisplayInfo()
 	dlgos<<"\r\n"<<"Path: "<<pathtxt<<"\r\n"<<"Command line: "<<cltxt<<"\r\n"<<Product<<" "<<Description
 	<<"\r\n"<<bintxt<<"\r\n"<<"CRC: "<<CRC;
 
-	if (phd._selected > 0)
-	{
+
 		_ps = dlgos.str();
-		/*dcs d;
-		d.hi = _hIcon;
-		d.s = _ps;
-		dispcache.insert(pair<long,dcs>(phd._selected,d));*/
-	}
-	else if (phd._mouseover > 0)
-	{
-		_ps2 = dlgos.str();
-		/*dcs d;
-		d.hi = _hIcon;
-		d.s = _ps2;
-		dispcache.insert(pair<long, dcs>(phd._mouseover, d));*/
-	}
-	/*SIZE sz;
-	sz.cx=1;
-	sz.cy=150;
-	SetSize(sz);*/
+
 }
 LRESULT PHTimeScale::OnPaint(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {

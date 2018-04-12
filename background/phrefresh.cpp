@@ -9,6 +9,10 @@ using namespace std;
 #include <algorithm>
 #include "..\phquery\PH.h"
 #include "..\ProcessHistory\Progress.h"
+#include "boost/date_time/posix_time/posix_time.hpp"
+
+using namespace boost::posix_time;
+using namespace boost;
 
 extern CPHLogger logger;
 extern map<long,CProcessInfo> process_map;
@@ -25,10 +29,11 @@ LoadPathData(m_sBar);
 
 	set<long> OldProcesses;
 	set<long> ignore;
+	int correction=0;
 	while(true)
 	{
-		Sleep(logger._Refresh);
-		
+		Sleep(logger._Refresh-correction);
+		ptime rb = microsec_clock::local_time();
 		HANDLE         hProcessSnap = NULL; 
 		PROCESSENTRY32 pe32      = {0}; 
  
@@ -71,6 +76,23 @@ LoadPathData(m_sBar);
 		/* Do not forget to clean up the snapshot object. */
 
 		CloseHandle (hProcessSnap); 
-		//cout << " g_clProcesses" << logger.g_clProcesses.size() << " OldProcesses" << OldProcesses.size() << "Process map" << process_map.size() << "PHPaths" << PHPaths.size() <<"PHCLs"<< PHCLs.size()<<endl;
+		ptime re = microsec_clock::local_time();
+		time_duration rtd= re - rb;
+		correction = 0;
+		//Refresh took longer than 500 milliseconds - don't wait
+		if (((rtd.seconds() < 1 && rtd.fractional_seconds() / 100 > 500) || rtd.seconds()>1) && logger._Refresh == 500)
+			correction = 500;
+		//refresh took less than 500ms, shorten
+		if (rtd.seconds() < 1 && logger._Refresh == 500 && rtd.fractional_seconds() / 100 < 500)
+				correction = rtd.fractional_seconds() / 100;
+
+		//Normal speed
+
+		//refresh took longer than a second - don't wait
+		if (rtd.seconds() > 0 && logger._Refresh == 1000)
+			correction = 1000;
+		//refresh took less than a second, shorten the refresh interval	
+		if (rtd.fractional_seconds() / 100 < 1000 &&  logger._Refresh == 1000)
+			correction = rtd.fractional_seconds() / 100;		
 	}
 }

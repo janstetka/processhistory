@@ -77,16 +77,15 @@ void Worker()
 
 LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	if (wParam == 4)//rh mouse not found
+	if (wParam == 2)//mouseover found
 	{
-		if (phti._MemDC != NULL)
+		if (phti._MemDC!=NULL)
 		{
 			RECT r;
-			r.top = 5;
+			r.top = 0;
 			r.bottom = phti._Height;
 			r.left = 0;
 			r.right = phti._Width;
-
 			COLORREF cr;
 			cr = 0x00FFFFFF;
 
@@ -99,23 +98,18 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 			if (phti.UpdateWindow() == 0)
 				PHTrace(Win32Error(), __LINE__, __FILE__);
 		}
-	
-		return 0;
-	}
 
-	if (wParam == 2)//mouseover found
-	{
 		if (phd._mouseover > 0)
 		{
 			phti.DisplayInfo();
-			
+			phti.CreateScreenBuffer();
 		
 		RECT r;
-		r.top = 5;
+		r.top = 0;
 		r.bottom = phti._Height;
 		r.left = 0;
 		
-			r.right = phd._Width;
+		r.right = phti._Width;
 		if(phti.InvalidateRect(&r,TRUE)==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 		if(phti.UpdateWindow()==0)
@@ -124,19 +118,30 @@ LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOO
 	
 		return 0;
 	}
-	if (wParam == 3)//mouseover gone into whitespace
+	if (wParam == 3 || wParam == 4)//mouseover gone into whitespace or rh mouse not found
 	{
 		RECT r;
-		r.top = 5;
+		r.top = 0;
 		r.bottom = phti._Height;
 		r.left = 0;
 		r.right = phti._Width;
-		
+		COLORREF cr;
+		cr = 0x00FFFFFF;
+
+		CBrush FillBrush;
+		FillBrush.CreateSolidBrush(cr);
+		if (phti._MemDC->FillRect(&r, FillBrush) == 0)
+		PHTrace(Win32Error(), __LINE__, __FILE__);
 		if(phti.InvalidateRect(&r,FALSE)==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 		if(phti.UpdateWindow()==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
-
+		//if (phti._MemDC != NULL)
+		//	delete phti._MemDC; 
+		SIZE s;
+		s.cy = s.cx = 1;
+		phti.SetSize(s);
+		
 		return 0;
 	}
 

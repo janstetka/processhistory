@@ -75,7 +75,7 @@ public:
 	}
 	long _ID;
 	HICON _hIcon;
-	std::string _ps,_ps2;
+	std::string _ps;// , _ps2;
 	int _Height,_Width;
 	CMemoryDC* _MemDC;
 
@@ -89,7 +89,7 @@ public:
 	PHTimeScale()
 	{
 		_MemDC = NULL;
-		_HeightTimeLine = 100;
+		_HeightTimeLine = 10;
 	}
 	DECLARE_WND_CLASS(_T("My Window Class"))
 	BEGIN_MSG_MAP(PHTimeScale)

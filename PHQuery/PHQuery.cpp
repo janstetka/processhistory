@@ -74,6 +74,11 @@ void PHQuery::Layout(list<PHProcess> clOrdered )
 		PHProcess php=*oi;
 		clExtent.tStart=php.start;
 		clExtent.tEnd=php.end;
+		if (clExtent.tEnd - clExtent.tStart < seconds(1))
+		{
+			clExtent.tEnd += seconds(1);
+			clExtent.tStart -= seconds(1);
+		}
 		int line=1;
 		while (!pl.Insert(clExtent, line))
 			
@@ -96,7 +101,7 @@ int PHQuery::Query()
 	db = OpenDB();
 
 	
-	clSQL="SELECT Process.ID,DATETIME(CreationTime),DATETIME(Destruction) FROM Process";
+	clSQL="SELECT Process.ID,strftime('%Y-%m-%d %H:%M:%f', CreationTime),strftime('%Y-%m-%d %H:%M:%f',Destruction) FROM Process";
 	
 	clSQL+=_SQL;
 
@@ -180,59 +185,5 @@ string PHQuery::Construct(ptime Begin)
 	/*string SQL=" WHERE ";	*/ //refactor
 	ptime end=phd.GetEndTime(Begin);
 	return ModifiedConstruct(Begin,end);
-	/*ostringstream os;
-	string begin_txt=BoostToSQLite(Begin),end_txt=BoostToSQLite(end);
-
-	//assert(!begin_txt.empty() || !end_txt.empty());
-	os<<"SELECT JULIANDAY('"	<< begin_txt	<<"'),JULIANDAY('"
-	<<end_txt	<<"');";
-
-	sqlite3 *db;
-	sqlite3_stmt* stmt;
-	string ejtxt,bjtxt;
-	lock_guard<mutex> sl(db_mutex);
-	db = OpenDB();
-	if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
-		DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
-
-	const unsigned char *bjul=0;
-	const unsigned char *ejul=0;
 	
-	if(sqlite3_step(stmt)== SQLITE_ROW )
-	{	
-		bjul =sqlite3_column_text(stmt,0);		
-		ejul =sqlite3_column_text(stmt,1);
-	}
-	//assert(!bjul==0 || !ejul==0);
-	if(bjul==0 || ejul==0)
-		PHTrace("Error constructing query",__LINE__,__FILE__);
-	ejtxt=(char*)ejul;
-	bjtxt=(char*)bjul;
-	sqlite3_finalize(stmt);
-	sqlite3_close(db);
-
-	os.str("");
-	if (phd.filter_exec || phd.filterUserID > 0)
-		os << " ( ";*/ //refactor
-	/*Starts within times - events too*/
-	/*os<<"( CreationTime>"	<<bjtxt	<<" AND CreationTime<"	<<ejtxt*/ //refactor
-
-	/*Ends within times*/
-	/*<<") OR ( Destruction<"	<<ejtxt	<<" AND Destruction>"	<<bjtxt
-	<<" AND Destruction NOTNULL)";
-
-	if(phq.long_processes)
-	{*/ //refactor
-		/*Overlaps times*/
-	/*	os<<" OR ( CreationTime<"	<<bjtxt	<<" AND Destruction>"	<<ejtxt
-		<<" AND Destruction NOTNULL) ";
-	}
-		if (phd.filter_exec || phd.filterUserID > 0)
-			os << " ) ";
-		if (phd.filter_exec)
-			os << " AND CRC=" << phd.filterCRC << " ";
-		if (phd.filterUserID>0)
-			os << " AND USERID=" << phd.filterUserID << " ";
-	SQL+=os.str();
-	return SQL;*/ //refactor
 }

@@ -45,7 +45,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	//phd.hInst=hInstance;	
 	//phd._WinLeft=second_clock::local_time();
 	logger._Refresh = 1000;
-	//TODO:logger._Refresh << string(lpstrCmdLine);
+	if( string(lpstrCmdLine)=="fast")
+	logger._Refresh = 500;
 
 	hRes = _Module.Init(NULL, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));

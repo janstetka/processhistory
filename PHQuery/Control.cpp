@@ -824,15 +824,16 @@ LRESULT CMainFrame::OnFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/,
 	}
 	return 0;
 }
-//  UI- progress bar  - clk progress to cancel?
+//delete phti._MemDC when nothing to display
+// -- UI- progress bar  - clk progress to cancel?
 
-//  manual control of refresh rate -  
-// sub second processes  visible with scaling e.g. change refresh rate to 500ms and 1 pixel == 500ms
+// ++ manual control of refresh rate -  time each cycle
+// ++sub second processes  visible, draw as greater than a second
 
-// ++ UI - for USER AND EXEC run query on dd selection
+//-- UI - for USER AND EXEC run query on dd selection
  
 
 // LEAVE drop crc
-//optimise - can version info code be dropped, what phacker does?
+//LEAVE optimise - can version info code be dropped, what phacker does?
 
 // LEAVE: show parent child relationship (in details) -> got to parent process???
