@@ -45,6 +45,7 @@ public:
 };
 
 #include <string>
+#include "..\sqlite\sqlite3.h"
 
 class PHTimeInfo : public CScrollWindowImpl<PHTimeInfo>
 {
@@ -53,6 +54,10 @@ public:
 	{
 		_MemDC = NULL;
 		_Height=500;
+	}
+	~PHTimeInfo()
+	{
+		sqlite3_close(tidb);
 	}
 	
 	DECLARE_WND_CLASS(NULL)
@@ -81,6 +86,7 @@ public:
 
 	void DrawMemDC();
 	void CalculateRect();
+	sqlite3 * tidb;
 };
 
 class PHTimeScale : public CWindowImpl<PHTimeScale>

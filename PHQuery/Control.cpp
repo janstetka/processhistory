@@ -202,7 +202,7 @@ m_sBar.SetPaneText(ID_PANE_2, "ALL" );
 	ph_instance._hWndCombo3 = m_Combo3.m_hWnd;
 
 	m_Combo.SetWindowTextA("YYYY[-MM-DD HH:MM:SS]");
-	m_Combo2.SetWindowTextA("Executable");
+	//m_Combo2.SetWindowTextA("Executable");
 
 	ph_instance._hWndStatusBar=m_hWndStatusBar;
 
@@ -236,6 +236,7 @@ m_sBar.SetPaneText(ID_PANE_2, "ALL" );
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 	
 	ph_instance._hWndResults=phs.m_hWnd;
+	phti.tidb =  OpenDB();
 
 	m_wndHorzSplit.SetSplitterPanes(phs, m_wndHorzSplit2);
 		
@@ -824,7 +825,7 @@ LRESULT CMainFrame::OnFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/,
 	}
 	return 0;
 }
-//delete phti._MemDC when nothing to display
+//doesn't behave quite right when no results leaves last query on screen but doesn't redraw it.
 // -- UI- progress bar  - clk progress to cancel?
 
 // ++ manual control of refresh rate -  time each cycle

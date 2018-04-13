@@ -34,6 +34,7 @@ public:
 	//bool WinXP;
 	//bool Win7;
 	int _Refresh;
+	sqlite3 * procdb;
 };
 
 void CreateTables();

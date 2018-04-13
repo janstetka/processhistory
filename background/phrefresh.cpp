@@ -30,7 +30,8 @@ LoadPathData(m_sBar);
 	set<long> OldProcesses;
 	set<long> ignore;
 	int correction=0;
-	while(true)
+	logger.procdb = OpenDB();
+	while (logger._Refresh>-1)
 	{
 		Sleep(logger._Refresh-correction);
 		ptime rb = microsec_clock::local_time();
@@ -64,15 +65,18 @@ LoadPathData(m_sBar);
 			//result present in first but not second
 			set<long> result;
 			set_difference(OldProcesses.begin(), OldProcesses.end(), Processes.begin(), Processes.end(),inserter(result, result.end()));
+			
+			
 			set<long>::iterator it;
 			for (it = result.begin(); it != result.end(); it++)
 			{
 				logger.StopEvent(*it);
 				ignore.erase(*it);
 			}
+			
 			OldProcesses=Processes;
 		} 
- 
+		
 		/* Do not forget to clean up the snapshot object. */
 
 		CloseHandle (hProcessSnap); 

@@ -232,7 +232,7 @@ void PHTimeInfo::DisplayInfo()
 	if(pit!=phq._PData.end())
 	{
 		lock_guard<mutex> sl(db_mutex);
-		sqlite3 *db=OpenDB();
+		//sqlite3 *tiddb=OpenDB();
 	
 		ostringstream os;
 		os <<
@@ -241,8 +241,8 @@ void PHTimeInfo::DisplayInfo()
 			os << _ID;
 		
 			os<<";";
-		if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
-			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
+			if (sqlite3_prepare(tidb, os.str().c_str(), -1, &stmt, NULL) != SQLITE_OK)
+				DBError(sqlite3_errmsg(tidb), __LINE__, __FILE__);
 		const unsigned char *commandline=0;
 		if(sqlite3_step(stmt)== SQLITE_ROW )
 		{
@@ -251,16 +251,16 @@ void PHTimeInfo::DisplayInfo()
 			cltxt=(char*)commandline;
 		}
 		sqlite3_finalize(stmt);
-		sqlite3_close(db);
+		
 		ostringstream os2;
 		os2 << "SELECT UserName,CRC FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= ";
 
 			os2 << _ID;
 
 		os2 << ";";
-		sqlite3 *db2=OpenDB();
-		if(sqlite3_prepare(db2,os2.str().c_str(),-1,&stmt2,NULL)!=SQLITE_OK)
-			DBError(sqlite3_errmsg(db2),__LINE__,__FILE__);
+		//sqlite3 *db2=OpenDB();
+		if(sqlite3_prepare(tidb,os2.str().c_str(),-1,&stmt2,NULL)!=SQLITE_OK)
+			DBError(sqlite3_errmsg(tidb),__LINE__,__FILE__);
 		const unsigned char *user;
 		
 		if(sqlite3_step(stmt2)== SQLITE_ROW )
@@ -270,7 +270,7 @@ void PHTimeInfo::DisplayInfo()
 			CRC=sqlite3_column_int(stmt2,1);
 		}
 		sqlite3_finalize(stmt2);
-		sqlite3_close(db2);
+		//sqlite3_close(db2);
 		map<long, string>::iterator qpit;
 
 		 qpit=phd.qrypaths.find(_ID);

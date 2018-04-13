@@ -72,7 +72,7 @@ void Worker()
 		phd._complete=true;
 		::PostMessage (ph_instance._hWnd, UWM_DOWNLOAD_PROGRESS, 0, 0 );
 	}
-	//phd._complete=true;
+	phd._complete=true;
 }
 
 LRESULT CMainFrame:: NotifyGUI (UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

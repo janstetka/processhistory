@@ -8,10 +8,9 @@ Boost C++ 1.57+ http://boost.org - requires the multithreaded 64bit binaries for
 Windows Template Library 9+ http://wtl.sf.net
 Process Hacker Library 2.33+ http://processhacker.sf.net - The latest version of Process Hacker requires the Windows 10 SDK https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
 
-Tested on Visual Studio 2013 community+
-
 Set the additional include directories for the dependencies.
 
-Set the output folders according to your preference.
-
 NB: The latest version of the process hacker library requires changing the calling convention to __stdcall (/Gz) and altering the pre processor defintions to match the Process Hacker project
+
+Profiled with https://github.com/VerySleepy/verysleepy
+Code duplication found with http://pmd.sourceforge.net/pmd-5.4.1/

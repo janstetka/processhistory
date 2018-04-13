@@ -143,21 +143,21 @@ void CProcessInfo::SaveProcess(ptime ExitTime)
 	clSQL<<"'));";
 	
 	
-	sqlite3 * db;
-	db=OpenDB();
+	//sqlite3 * db;
+	//db=OpenDB();
 	char * szErr;
 	{
 		lock_guard<mutex> sl(db_mutex);
 	//mutex::scoped_lock lock(db_mutex);
-	if(SQLITE_OK!=sqlite3_exec(db,clSQL.str().c_str(),NULL,NULL,&szErr))
+	if(SQLITE_OK!=sqlite3_exec(logger.procdb,clSQL.str().c_str(),NULL,NULL,&szErr))
 		DBError(szErr,__LINE__,__FILE__);
 	else 
-		_ProcessID=sqlite3_last_insert_rowid(db);
+		_ProcessID = sqlite3_last_insert_rowid(logger.procdb);
 	}
 	if(_ProcessID<1)
 		PHTrace("ProcessID less than 1",__LINE__,__FILE__);			
 	
-	sqlite3_close(db);
+	//sqlite3_close(db);
 	
 	return;
 }

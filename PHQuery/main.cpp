@@ -52,7 +52,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	ATLASSERT(SUCCEEDED(hRes));
 
 	int nRet = Run(lpstrCmdLine, nCmdShow);
-
+	sqlite3_close(logger.procdb);
 	_Module.Term();
 	::CoUninitialize();
 
