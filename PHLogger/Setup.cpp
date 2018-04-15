@@ -13,18 +13,8 @@ void LoadPathData();
 
 void CPHLogger::StartProcessHistory()
 {	
-	/*if(sqlite3_threadsafe()>0)
-		PHMessage("SQLite threadsafe");
-	else
-		PHMessage("SQLite not threadsafe");*/
-		
 	CreateTables();
-
-		ReadUserTable();
-
-	//LoadPathData(m_sBar);
-	//LoadCommandLines(m_sBar);
-
+	ReadUserTable();
 	thread refresh(	RefreshThread);
 	refresh.detach();
 }

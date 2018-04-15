@@ -18,8 +18,13 @@ struct PHProcessData
 /*Only one instance of this class is allowed, singleton*/
 class CPHLogger 
 {
-
-public:		
+public:
+	~CPHLogger()
+	{
+		sqlite3_close(procdb);
+	}
+		
+		
 
 	void StartProcessHistory();
 	void StartEvent( long lPId);
@@ -30,7 +35,7 @@ public:
 	std::map<long,PHProcessData> g_clProcesses;
 
 	//boost::mutex processes_mutex;
-	//void InitialProcessStart(long id);
+	
 	//bool WinXP;
 	//bool Win7;
 	int _Refresh;

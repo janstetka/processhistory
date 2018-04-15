@@ -4,7 +4,7 @@
 #include "screen.h"
 #include "Query.h"
 #include "..\phshared\phshared.h"
-#include "wtl\wtl.h"
+//#include "wtl\wtl.h"
 
 using namespace boost;
 using namespace boost::posix_time;

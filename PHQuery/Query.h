@@ -28,7 +28,7 @@ public:
 	std::map<long,int> _Lines;
 	std::map<long,PHProcess> _Processes;
 	/*both*/
-	std::map<long,long> _PData;
+	std::map<long,long> _PData; //path id
 	void clear();
 	long _lCount;
 

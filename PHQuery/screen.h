@@ -25,7 +25,7 @@ class PHDisplay
 		::SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0);
 
 		_font=ncm.lfMenuFont;
-		scale=1000;
+		//scale=1000;
 		
 	}
 	boost::posix_time::ptime _WinLeft, _WinRight;
@@ -35,7 +35,7 @@ class PHDisplay
 
 	/*a list of whats on screen now is kept in ProcessAreas */
 	std::map<long,RECT> _ProcessAreas;
-	std::map<long,HICON> icons;
+	std::map<long,HICON> icons;//lifetime of PH
 
 	bool _complete;
 	LOGFONT _font;
@@ -48,7 +48,7 @@ class PHDisplay
 	public:
 	
 	std::set<long> _clipped_left,_clipped_right;
-	std::map<long,std::string> _EXEImages;
+	std::map<long,std::string> _EXEImages;//version info, lifetime of PH
 	
 	std::map<long,std::string> qrypaths;
 
@@ -67,7 +67,7 @@ class PHDisplay
 	int filterUserID;
 	unsigned long filterCRC;
 	bool _process_detail;
-	float scale; //ms represented by a pixel
+	//float scale; //ms represented by a pixel
 };
 
 void GetVersionInfo(std::string & Product, std::string & Description, std::string path);

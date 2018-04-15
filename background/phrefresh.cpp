@@ -16,8 +16,6 @@ using namespace boost;
 
 extern CPHLogger logger;
 extern map<long,CProcessInfo> process_map;
-extern map< string,long> PHCLs;
-extern map< string,long> PHPaths;
 extern PH ph_instance;
 
 void RefreshThread()
@@ -82,21 +80,26 @@ LoadPathData(m_sBar);
 		CloseHandle (hProcessSnap); 
 		ptime re = microsec_clock::local_time();
 		time_duration rtd= re - rb;
+		
 		correction = 0;
-		//Refresh took longer than 500 milliseconds - don't wait
-		if (((rtd.seconds() < 1 && rtd.fractional_seconds() / 100 > 500) || rtd.seconds()>1) && logger._Refresh == 500)
-			correction = 500;
-		//refresh took less than 500ms, shorten
-		if (rtd.seconds() < 1 && logger._Refresh == 500 && rtd.fractional_seconds() / 100 < 500)
-				correction = rtd.fractional_seconds() / 100;
-
-		//Normal speed
+		//ms
+		//don't wait
+		if (((rtd.seconds() < 1 && rtd.fractional_seconds() / 1000 > logger._Refresh) || rtd.seconds()>1) && logger._Refresh < 1000)
+			correction = logger._Refresh;
+		// shorten
+		if (rtd.seconds() < 1 && logger._Refresh <1000 && rtd.fractional_seconds() / 1000 < logger._Refresh)
+			correction = rtd.fractional_seconds() / 1000;
+			 
+		//Over a second
 
 		//refresh took longer than a second - don't wait
-		if (rtd.seconds() > 0 && logger._Refresh == 1000)
-			correction = 1000;
+		if (rtd.seconds() > 0 && logger._Refresh >= 1000 && rtd>seconds(logger._Refresh/1000))
+			correction = logger._Refresh;
 		//refresh took less than a second, shorten the refresh interval	
-		if (rtd.fractional_seconds() / 100 < 1000 &&  logger._Refresh == 1000)
-			correction = rtd.fractional_seconds() / 100;		
+		//if (  (logger._Refresh) >rtd)
+		//	correction = rtd.fractional_seconds() / 1000;		
+
+		//::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" correction"+lexical_cast<string>(correction)).c_str());
+
 	}
 }

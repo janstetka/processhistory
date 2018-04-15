@@ -19,7 +19,7 @@ using namespace std;
 using namespace boost;
 
 extern CPHLogger logger;
-extern map<string,long> PHPaths;
+//extern map<string,long> PHPaths;
 
  extern mutex db_mutex;
 

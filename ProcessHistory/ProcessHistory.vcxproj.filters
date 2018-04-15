@@ -161,9 +161,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\processhacker-2.33-src\lib\lib64\ntdll.lib" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="..\PHQuery\bmp00001.bmp">
       <Filter>Resource Files</Filter>
     </Image>

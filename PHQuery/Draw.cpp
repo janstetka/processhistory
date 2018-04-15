@@ -4,7 +4,7 @@ GDI */
 #include "screen.h"
 #include "query.h"
 #include "..\phshared\phshared.h"
-#include "wtl\wtl.h"
+//#include "wtl\wtl.h"
 #include "..\ProcessHistory\PHScroll.h"
 #include "PH.h"
 #include "gdiplus.h"
@@ -229,14 +229,14 @@ void PHDisplay::ReadPaths()// base on paths.id avoids duplication
 								icons.insert(pair< long,HICON>(PathID,hIcon));							
 			 }
 		
-			 map<long,string>::iterator ver_it = phd._EXEImages.find(PathID);
-			 if(ver_it==phd._EXEImages.end())
+			 map<long,string>::iterator ver_it = _EXEImages.find(PathID);
+			 if(ver_it==_EXEImages.end())
 			 {
 				string Product,Description;
 				GetVersionInfo(Product,Description,FileName);	 //TODO: See what PHacker does for this to reduce overall code.
 				if(!Product.empty())// || !Description.empty())
 				{
-					phd._EXEImages.insert(pair< long,string>(PathID,Product));
+					_EXEImages.insert(pair< long,string>(PathID,Product));
 				}
 			 }
 			}

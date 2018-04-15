@@ -91,7 +91,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);_WTL_NO_CSTRING;_WTL_NO_WTYPES</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -99,6 +99,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>E:\12\boost_1_66_0;C:\WTL\Include;C:\src\background\nowide_standalone;C:\processhacker-2.33-src\phlib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CallingConvention>StdCall</CallingConvention>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)ProcessHistory.exe</OutputFile>
@@ -106,6 +108,8 @@
       <ProgramDatabaseFile>$(OutDir)ProcessHistory.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>E:\12\boost_1_66_0\lib32-msvc-12.0;C:\processhacker-2.33-src\phlib\bin\Debug32;C:\processhacker-2.33-src\lib\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\processhacker-2.33-src\phlib\bin\Debug32\phlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -216,9 +220,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\PHQuery\resources.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\processhacker-2.33-src\lib\lib64\ntdll.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\PHQuery\bmp00001.bmp" />

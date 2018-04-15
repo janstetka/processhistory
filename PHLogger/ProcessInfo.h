@@ -12,7 +12,7 @@ public:
 	CProcessInfo(){}
 	/*Constructor that needs to be called to populate the class*/
 	CProcessInfo(long lPId);
-	void GetExecutableImage();// bool);//std::string &);	
+	void GetExecutableImage();	
 	void SaveProcess(boost::posix_time::ptime);
 	bool Validate();
 	std::string GetStartTime()	{	return BoostToSQLite(_StartTime);	}
@@ -24,7 +24,6 @@ public:
 	void ConvertStartTime();
 	void LoadProcessData();
 	long _UserID;
-	//bool _is_already_logged;
 	std::string _path;
 	std::string _commandline;
 	bool _bUserFail;
@@ -38,15 +37,5 @@ private:
 	FILETIME _WIN32Time;
 	unsigned long _CRC;
 };
-//void WMIGetProcess(long PID,std::string & cl,std::string col,std::string);
-
-/*struct InitialProcess
-{
-	CProcessInfo pi;
-	HANDLE hProcess;
-};*/
-
-//void SetupCOM();
-//void ReleaseCOM();
 
 #endif

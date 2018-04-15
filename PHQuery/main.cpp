@@ -25,6 +25,7 @@ int Run(LPTSTR /*lpstrCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
 }
 
 #include "..\PHLogger\PHLogger.h"
+
 using namespace std;
 extern CPHLogger logger;
 
@@ -45,14 +46,16 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	//phd.hInst=hInstance;	
 	//phd._WinLeft=second_clock::local_time();
 	logger._Refresh = 1000;
-	if( string(lpstrCmdLine)=="fast")
-	logger._Refresh = 500;
+	if (lpstrCmdLine!=NULL)
+		logger._Refresh = boost::lexical_cast<int>(string(lpstrCmdLine));
+	//logger._Refresh = 500;
 
 	hRes = _Module.Init(NULL, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));
 
 	int nRet = Run(lpstrCmdLine, nCmdShow);
-	sqlite3_close(logger.procdb);
+	logger._Refresh = -1;
+	
 	_Module.Term();
 	::CoUninitialize();
 

@@ -1,5 +1,5 @@
 #include "..\ProcessHistory\MainFrm.h"
-#include "wtl\wtl.h"
+//#include "wtl\wtl.h"
 #include <atlctrls.h>
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "PH.h"

@@ -28,22 +28,14 @@ RECT  PHDisplay::CalculateRect(ptime Start,ptime End ,ptime Left,int iLine)
 	time_duration clEventTime=Start-Left;
 		/*Calculate the total minutes*/
 		long lxStartPos=
-			(clEventTime.hours()*3600000/phd.scale)+(clEventTime.minutes()*60000/phd.scale) 
-			+ (clEventTime.seconds()*1000/phd.scale);
+			(clEventTime.hours()*3600)+(clEventTime.minutes()*60) 
+			+ (clEventTime.seconds());
 
 		long lxEndPos;
 
 			clEventTime=End-Left;
-			lxEndPos=(clEventTime.hours()*3600000/phd.scale)+(clEventTime.minutes()*60000/phd.scale)
-				+ (clEventTime.seconds()*1000/phd.scale);
-
-			//if (clEventTime<seconds(1))
-
-			//scale 3000 would get 60 minutes in 1200 pixels - limit scale between 1 and 1000?
-			//scale 1000 would be 1 sec / pixel
-				//scale 50 would get 60 seconds in 1200 pixels
-				//scale 1 = ms per pixel
-				//scale 0.8 would get 1 second in 1250 pixels
+			lxEndPos=(clEventTime.hours()*3600)+(clEventTime.minutes()*60)
+				+ (clEventTime.seconds());
 
 		RECT rcEvent;
 		rcEvent.left=lxStartPos;

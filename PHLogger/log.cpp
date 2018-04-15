@@ -54,7 +54,7 @@ void CPHLogger ::StartEvent( long lPId)
 	{
 	//mutex::scoped_lock log_scoped_lock(logger.processes_mutex);
 	/*This needs to be put in the map whether or not the process is in the data*/
-	logger.g_clProcesses.insert(pair<long,PHProcessData>(lPId,phpd));
+	g_clProcesses.insert(pair<long,PHProcessData>(lPId,phpd));
 	}
 }
 
@@ -103,8 +103,8 @@ void CPHLogger ::StopEvent(long lPID)
 	map<long,PHProcessData>::iterator llit;
 	{
 		//mutex::scoped_lock log_scoped_lock(logger.processes_mutex);
-		llit=logger.g_clProcesses.find(lPID);
-		if(llit==logger.g_clProcesses.end())	
+		llit=g_clProcesses.find(lPID);
+		if(llit==g_clProcesses.end())	
 			return;/*It wasn't caught starting so no information can be gathered*/
 
 	}
@@ -113,7 +113,7 @@ void CPHLogger ::StopEvent(long lPID)
 	if(!dp.ExitTime(llit->second.hP))
 	{
 		//mutex::scoped_lock log_scoped_lock(logger.processes_mutex);
-		logger.g_clProcesses.erase(lPID);
+		g_clProcesses.erase(lPID);
 		return;
 	}
 	/*Only allow one thread to execute the code to log an event at a time */
@@ -131,7 +131,7 @@ void CPHLogger ::StopEvent(long lPID)
 		{	
 			//mutex::scoped_lock log_scoped_lock(logger.processes_mutex);
 			Creation=llit->second.time;
-			logger.g_clProcesses.erase(lPID);
+			g_clProcesses.erase(lPID);
 		}					
 
 	/*The process may have started whilst PH wasn't running
