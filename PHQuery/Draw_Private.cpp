@@ -1,15 +1,7 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
-#include "..\phshared\phshared.h"
 #include "screen.h"
-#include "query.h"
-#include <sstream>
 
 using namespace boost::posix_time;
-using namespace std;
-using namespace boost;
-
-extern PHQuery phq;
-extern PHDisplay phd;
 
 /*Draws a time axis.
 the DC to draw onto

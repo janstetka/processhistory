@@ -6,11 +6,16 @@
 #include "boost/date_time/local_time_adjustor.hpp"
 #include "boost/date_time/c_local_time_adjustor.hpp"
 #include <set>
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+using namespace boost;
+#endif
 
 using namespace std;
 using namespace boost::posix_time;
-using namespace boost;
+using namespace boost::date_time;
 
 /*fine grain threading*/
 
@@ -77,7 +82,7 @@ public:
 		try
 		{
 			_Exit= from_ftime<ptime>(ftExit);
-			_Exit=date_time::c_local_adjustor<ptime>::utc_to_local(_Exit);
+			_Exit=c_local_adjustor<ptime>::utc_to_local(_Exit);
 		}
 		catch(...)
 		{

@@ -1,6 +1,13 @@
+#if defined (_WIN64)
 #include "c:\processhacker-2.33-src\phlib\include\ph.h"	
+#include "C:\processhacker-2.33-src\ProcessHacker\include\phappres.h"
+#else
+#include "c:\processhacker-2.28-src\phlib\include\ph.h"	
+#include "C:\processhacker-2.28-src\ProcessHacker\include\phappres.h"
+#endif
 #include "phacker.h"
 #include <wchar.h>
+
 
 PWSTR PhpGetStringOrNa(
     __in PPH_STRING String
@@ -11,9 +18,30 @@ PWSTR PhpGetStringOrNa(
     else
         return L"N/A";
 }
-void ProcessHackerStart()
+PWSTR ProcessHackerStart()
 {
 	PhInitializePhLib();
+	PPH_STRING appName;
+
+#if (PHAPP_VERSION_REVISION != 0)
+	appName = PhFormatString(
+		L"Process Hacker %u.%u (r%u)",
+		PHAPP_VERSION_MAJOR,
+		PHAPP_VERSION_MINOR,
+		PHAPP_VERSION_REVISION
+		);
+#else
+	appName = PhFormatString(
+		L"Process Hacker %u.%u",
+		PHAPP_VERSION_MAJOR,
+		PHAPP_VERSION_MINOR
+		);
+#endif
+	wchar_t * retval = calloc((ULONG)appName->Length, sizeof(wchar_t));
+
+	wcsncpy(retval, PhpGetStringOrNa(appName), (ULONG)appName->Length);
+	PhDereferenceObject(appName);
+	return retval;
 }
 
 PWSTR PHiGetCommandLine(HANDLE h)

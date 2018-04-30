@@ -12,7 +12,6 @@ using namespace std;
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 using namespace boost::posix_time;
-using namespace boost;
 
 extern CPHLogger logger;
 extern map<long,CProcessInfo> process_map;

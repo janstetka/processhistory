@@ -3,9 +3,10 @@ extern "C"
 {
 #endif
 PWSTR PHiGetCommandLine(HANDLE h);
-void ProcessHackerStart();
+PWSTR ProcessHackerStart();
 //PWSTR PHackGetImageFile(HANDLE h);
 //void Dereference(PPH_STRING str);
+
 #ifdef __cplusplus
 }
 #endif

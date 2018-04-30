@@ -11,12 +11,19 @@
 #include "..\phshared\Crc32Static.h"
 #include "..\background\phacker.h"
 #include "nowide\convert.hpp"
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp>
+using namespace boost;
+#endif
 
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace std;
-using namespace boost;
+using namespace boost::date_time;
+using namespace boost::algorithm;
 
 extern CPHLogger logger;
 //extern map<string,long> PHPaths;
@@ -47,14 +54,14 @@ CProcessInfo::CProcessInfo(long lPId)
 	/*Retreive the process start time*/
 	BOOL bRet = GetProcessTimes(hProcess,&ftCreation,&ftExit,&ftKernel,&ftUser);
 	GetProcessUser(hProcess,_User);	
-	
+//#if defined (_WIN64)
 	PWSTR pCL = PHiGetCommandLine(hProcess);
 	if (pCL != 0)
 	{
 		_commandline = nowide::narrow(pCL);
 		free(pCL);
 	}
-
+//#endif
 	CloseHandle(hProcess);	
 
 
@@ -77,7 +84,7 @@ void CProcessInfo::ConvertStartTime()
 {
 	_StartTime=from_ftime<ptime>(_WIN32Time);
 	/*store as local time*/
-	_StartTime=date_time::c_local_adjustor<ptime>::utc_to_local(_StartTime);
+	_StartTime=c_local_adjustor<ptime>::utc_to_local(_StartTime);
 }
 
 /*Are the time, PID, user valid*/

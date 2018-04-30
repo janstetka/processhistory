@@ -4,15 +4,11 @@ GDI */
 #include "screen.h"
 #include "query.h"
 #include "..\phshared\phshared.h"
-//#include "wtl\wtl.h"
 #include "..\ProcessHistory\PHScroll.h"
 #include "PH.h"
 #include "gdiplus.h"
 
-//using namespace Gdiplus;
-using namespace boost::posix_time;
 using namespace std;
-using namespace boost;
 
 PHDisplay phd;
 extern PHQuery phq;
@@ -177,9 +173,16 @@ _MemDC->SetTextColor(old_txt);
 	}/*end process*/
 
 #include <boost/filesystem.hpp>
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp> 
+	using namespace boost;
+#endif
 
 extern mutex db_mutex;
+using namespace boost::filesystem;
 
 void PHDisplay::ReadPaths()// base on paths.id avoids duplication 
 {
@@ -211,7 +214,7 @@ void PHDisplay::ReadPaths()// base on paths.id avoids duplication
 
 			long PathID= sqlite3_column_int(stmt,1);
 			phq._PData.insert(pair<long,long>(lID,PathID));
-			if ( boost::filesystem::exists(FileName))
+			if ( exists(FileName))
 			{
 			map<long,HICON>::iterator icon_it= icons.find(PathID);
 			if(icon_it==icons.end())

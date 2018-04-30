@@ -1,18 +1,14 @@
-//#include "pathdlg.h"
 #include "PH.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "screen.h"
 #include "Query.h"
 #include "..\phshared\phshared.h"
-//#include "wtl\wtl.h"
 
-using namespace boost;
 using namespace boost::posix_time;
 using namespace std;
 
 extern PHQuery phq;
 extern PH ph_instance;
-extern PHDisplay phd;
 
 /*For the query times 1 pixel = 1 second*/
 ptime PHDisplay::GetEndTime(ptime Left)

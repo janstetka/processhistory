@@ -1,13 +1,16 @@
 #include "PHLogger.h"
 #include "PHLogUser.h"
 #include "..\phshared\phshared.h"
+
+#if defined (_WIN64)
 #include <thread>
-
-using namespace std;
+#else
+#include "boost\thread\thread.hpp"
 using namespace boost;
-using namespace boost::posix_time;
+#endif
+using namespace std;
 
-std::map<string,long> PHPaths;
+map<string,long> PHPaths;
 
 void LoadPathData();
 

@@ -1,7 +1,13 @@
 #include "..\phshared\phshared.h"
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp> 
+using namespace boost;
+#endif
 
-//using namespace boost;
+
 using namespace std;
 
 extern mutex db_mutex;

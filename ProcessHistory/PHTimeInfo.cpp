@@ -4,11 +4,17 @@
 #include "..\PHQuery\resource.h"
 #include "PHScroll.h"
 #include <boost/filesystem.hpp>
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp> 
+using namespace boost;
+#endif
 
 using namespace boost::posix_time;
 using namespace std;
-using namespace boost;
+using namespace boost::filesystem;
 
 extern PHQuery phq;
 extern PHDisplay phd;
@@ -187,7 +193,7 @@ void PHTimeScale::DrawTimeAxis()
 			zero="";
 		else	
 			zero="0";
-		string TimeText=lexical_cast<string>(pti.time_of_day().hours())+":"+zero+lexical_cast<string>(pti.time_of_day().minutes());
+		string TimeText = boost::lexical_cast<string>(pti.time_of_day().hours()) + ":" + zero + boost::lexical_cast<string>(pti.time_of_day().minutes());
 					
 		RECT r;
 		r.left = 0;
@@ -232,8 +238,7 @@ void PHTimeInfo::DisplayInfo()
 	if(pit!=phq._PData.end())
 	{
 		lock_guard<mutex> sl(db_mutex);
-		//sqlite3 *tiddb=OpenDB();
-	
+			
 		ostringstream os;
 		os <<
 			"SELECT CommandLine FROM Process  JOIN CommandLines ON Process.clid=CommandLines.ID WHERE Process.ID=";
@@ -258,7 +263,7 @@ void PHTimeInfo::DisplayInfo()
 			os2 << _ID;
 
 		os2 << ";";
-		//sqlite3 *db2=OpenDB();
+		
 		if(sqlite3_prepare(tidb,os2.str().c_str(),-1,&stmt2,NULL)!=SQLITE_OK)
 			DBError(sqlite3_errmsg(tidb),__LINE__,__FILE__);
 		const unsigned char *user;
@@ -270,7 +275,7 @@ void PHTimeInfo::DisplayInfo()
 			CRC=sqlite3_column_int(stmt2,1);
 		}
 		sqlite3_finalize(stmt2);
-		//sqlite3_close(db2);
+		
 		map<long, string>::iterator qpit;
 
 		 qpit=phd.qrypaths.find(_ID);
@@ -280,7 +285,7 @@ void PHTimeInfo::DisplayInfo()
 		{
 			pathtxt=qpit->second;
 
-			if ( boost::filesystem::exists(pathtxt))
+			if ( exists(pathtxt))
 			{
 
 			GetVersionInfo(Product,Description,pathtxt);

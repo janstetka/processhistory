@@ -1,17 +1,21 @@
 #include "..\ProcessHistory\MainFrm.h"
-//#include "wtl\wtl.h"
 #include <atlctrls.h>
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "PH.h"
 #include "screen.h"
 #include "query.h"
 #include "..\ProcessHistory\PHScroll.h"
+#if defined (_WIN64)
 #include <thread>
+#else
+#include "boost\thread\thread.hpp"
+using namespace boost;
+#endif
 #include "..\phshared\phshared.h"
 //#include <mutex>
 
 using namespace boost::posix_time;
-using namespace boost;
+
 using namespace std;
 
 extern PH ph_instance;

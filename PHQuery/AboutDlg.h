@@ -3,6 +3,9 @@
 
 #include <string>
 #include "..\phshared\phshared.h"
+//#include "..\background\phacker.h"
+
+std::string ProcessHackerVer;
 
 class AboutCtrl : public CDialogImpl<AboutCtrl>
 {
@@ -15,7 +18,7 @@ public:
 	END_MSG_MAP()
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
-		OSVERSIONINFOEX osvi;
+	/*	OSVERSIONINFOEX osvi;
 	BOOL bOsVersionInfoEx;
 
 	// Try calling GetVersionEx using the OSVERSIONINFOEX structure.
@@ -35,11 +38,14 @@ public:
 	}
 	SYSTEM_INFO si;
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
-	GetNativeSystemInfo(&si);
+	GetNativeSystemInfo(&si);*/
 
 	std::ostringstream os;
-	os<<"The remaining portion of the software may be distributed under the terms of the General Public License \n Contains SQLite,WTL, Boost and Process Hacker which have their own licenses and authors\n";
-	if(osvi.dwMajorVersion==5 && osvi.dwMinorVersion==1)
+	os << "SQLite : ";
+	os << SQLITE_VERSION << "\n"
+		<< "Windows Template Library : " << std::hex << _WTL_VER << "\n";
+	os << "Boost C++ (datetime,filesystem) : " << BOOST_LIB_VERSION << "\n"  << ProcessHackerVer << "\n";
+	/*if(osvi.dwMajorVersion==5 && osvi.dwMinorVersion==1)
 	{
 		os<<"Windows XP";
 		if(si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_INTEL)
@@ -47,13 +53,18 @@ public:
 	}
 	if(osvi.dwMajorVersion==6 && osvi.dwMinorVersion==1 )
 	{
-		os<<"Windows 7";
-		#if defined(_WIN64)
-		os<<" 64bit client";
-		#endif
-		if(si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
+		os<<"Windows 7";*/
+		
+	/*	if(si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
 			os<<" 64 bit CPU";
-	}
+	}*/
+		os<< "Built : " << __DATE__<<" "<<__TIME__;
+		os << "\nMicrosoft Visual C++ : " <<std::dec<< _MSC_VER;
+#if defined(_WIN64)
+		os<<" 64bit ";
+#else
+		os<<" 32bit";
+		#endif
 		std::string file;
 	GetModulePath(file);
 	file.append("PHTrace.txt");

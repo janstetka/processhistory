@@ -7,10 +7,19 @@ nowide standalone: http://utf8everywhere.org
 Boost C++ 1.57+ http://boost.org - requires the multithreaded 64bit binaries for datetime, file(system) to be linked https://sourceforge.net/projects/boost/files/boost-binaries/
 Windows Template Library 9+ http://wtl.sf.net
 Process Hacker Library 2.33+ http://processhacker.sf.net - The latest version of Process Hacker requires the Windows 10 SDK https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk
+(Process Hacker 2.33 is the last version to use Visual Studio 2012)
 
 Set the additional include directories for the dependencies.
 
 NB: The latest version of the process hacker library requires changing the calling convention to __stdcall (/Gz) and altering the pre processor defintions to match the Process Hacker project
+
+The above instructions work fine for 64bit Windows 7 Visual Studio 2013-2017 Community
+
+For 32bit Windows XP use Visual C++ 2010 Express (6VPJ7-H3CXH-HBTPT-X4T74-3YVY7), get the WinDDK as specified in the WTL readme for ATL <TODO>
+Process Hacker 2.28 is the last version to use VS2010
+For C++11 thread requires visual studio 2012 https://msdn.microsoft.com/en-us/library/hh409293(v=vs.110).aspx (update 1 for xp as a target)
+Target XP 2012 and above 
+Build boost with cxxflags=/Gz for __stdcall
 
 Profiled with https://github.com/VerySleepy/verysleepy
 Code duplication found with http://pmd.sourceforge.net/pmd-5.4.1/

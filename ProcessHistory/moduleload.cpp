@@ -1,10 +1,16 @@
 #include "..\phshared\phshared.h"
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp> 
+using namespace boost;
+#endif
 #include "boost/algorithm/string.hpp"
 #include "..\phlogger\phlogger.h"
 
 using namespace std;
-using namespace boost;
+using namespace boost::algorithm;
 
 extern map<string,long> PHPaths;
 //boost::mutex paths_mtx,cl_mtx;
@@ -13,7 +19,7 @@ extern mutex db_mutex;
 long GetPathID(string path)
 {
 	//boost::mutex::scoped_lock psl(paths_mtx);	
-	algorithm::to_lower(path);
+	to_lower(path);
 	map<string,long>::iterator path_it=PHPaths.find(path);
 	long PathID=-1;
 
@@ -57,7 +63,7 @@ long getclid(string cl)
 {
 	
 	//boost::mutex::scoped_lock psl(cl_mtx);
-	algorithm::to_lower(cl);
+	to_lower(cl);
 	map<string,long>::iterator path_it=PHCLs.find(cl);
 	long PathID=-1;
 

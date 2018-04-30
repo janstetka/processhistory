@@ -5,7 +5,7 @@
 //#include <boost/thread/mutex.hpp>
 
 using namespace std;
-using namespace boost;
+//using namespace boost;
 
 map<string,long> g_clUser;
 //extern mutex db_mutex;

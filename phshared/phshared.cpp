@@ -12,7 +12,7 @@
 
 using namespace boost::posix_time;
 using namespace std;
-using namespace boost;
+//using namespace boost;
 // a mutex here may actually increase performance
 //reads may be sequential, process shared
 //mutex crc_mutex;

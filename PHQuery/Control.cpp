@@ -5,12 +5,20 @@
 #include "screen.h"
 #include "query.h"
 #include "..\phshared\PHShared.h"
+#include "nowide\convert.hpp"
+#if defined (_WIN64)
 #include <thread>
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp> 
+#include <boost\thread\thread.hpp>
+using namespace boost;
+#endif
 
 using namespace std;
 using namespace boost::posix_time;
-using namespace boost;
+
 using namespace boost::gregorian;
 
 extern PHDisplay phd;
@@ -18,14 +26,6 @@ PH ph_instance;
 extern PHQuery phq;
 ptime wr,wl;
 extern mutex db_mutex;
-
-void PHCOMError(HRESULT hr,std::string s,int line, std::string file)
-{	
-	std::ostringstream os;
-	os<<"0x"<<std::hex<<hr;
-	os<<" "<<s;
-	PHTrace(os.str(),line,file);
-}
 
 mutex work_mtx;
 
@@ -251,7 +251,15 @@ m_sBar.SetPaneText(ID_PANE_2, "ALL" );
    
    // Initialize GDI+.
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-	ProcessHackerStart();
+//#if defined (_WIN64)
+	PWSTR pCL = ProcessHackerStart();
+	
+	if (pCL != 0)
+	{
+		ProcessHackerVer = nowide::narrow(pCL);
+		free(pCL);
+	}
+//#endif
 	ph_instance._hWndProgress = m_sBar.m_Progress;
 	logger.StartProcessHistory();
 	FillUserList();
@@ -328,14 +336,14 @@ struct Worker4Thread
 	HWND h;
 	CMPSBarWithProgress* m_sBar;
 };
-
+//using namespace boost;
 void Worker4(Worker4Thread w4t)
 {
 	lock_guard<mutex> sl(work_mtx);
 	month_iterator titr(w4t.start,1);
 	w4t.m_sBar->ProgSetRange(0,12);
 	sqlite3 *db=OpenDB();
-	for(;titr<=date(lexical_cast<int>(w4t.s),12,31);++titr)
+	for(;titr<=date(boost::lexical_cast<int>(w4t.s),12,31);++titr)
 	{
 		ostringstream os;
 		os<<"SELECT ID FROM Process"
@@ -453,7 +461,7 @@ void CMainFrame::ParseQry()
 		date start;
 		try
 		{
-			start=date(lexical_cast<int>(s),1,1);
+			start = date(boost::lexical_cast<int>(s), 1, 1);
 		}
 		catch(...)
 		{
@@ -563,6 +571,7 @@ LRESULT CMainFrame::OnProcessViewSelected(WORD /*wNotifyCode*/, WORD /*wID*/, HW
 	
 }
 #include <boost/filesystem.hpp>
+using namespace boost::filesystem;
 LRESULT CMainFrame::OnExecRunSel(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	if(phd._selected>0)
@@ -570,7 +579,7 @@ LRESULT CMainFrame::OnExecRunSel(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWnd
 		map<long,string>::iterator qpit=phd.qrypaths.find(phd._selected);
 		if(qpit!=phd.qrypaths.end())
 		{
-			if ( boost::filesystem::exists(qpit->second))
+			if ( exists(qpit->second))
 			{
 			if((int)ShellExecute(NULL, "Open",qpit->second.c_str(),NULL,NULL,SW_SHOWDEFAULT)<33)
 				PHTrace(Win32Error(),__LINE__,__FILE__);
@@ -591,7 +600,7 @@ LRESULT CMainFrame::OnExecOCF(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		map<long,string>::iterator qpit=phd.qrypaths.find(phd._selected);
 		if(qpit!=phd.qrypaths.end())
 		{
-			if ( boost::filesystem::exists(qpit->second))
+			if ( exists(qpit->second))
 			{
 			command +=qpit->second;
 			
