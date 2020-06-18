@@ -3,7 +3,13 @@
 #include "..\screen.h"
 #include "..\PH.h"
 #include "..\query.h"
+#if defined (_WIN64)
 #include <mutex>
+#else
+#include "boost\thread\mutex.hpp"
+#include <boost\thread\lock_guard.hpp> 
+using namespace boost;
+#endif
 #include "..\..\phshared\phshared.h"
 
 extern PHDisplay phd;
@@ -12,56 +18,66 @@ using namespace std;
 extern PHQuery phq;
 extern mutex db_mutex;
 
-LRESULT PHScroll::OnRB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)//TODO: right click 2 seqentially not updating phti, if scrolled and right click resets scroll and draws selected over
+LRESULT PHScroll::OnRB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 {
-	int x=GET_X_LPARAM(lParam);
-	int y=GET_Y_LPARAM(lParam);
+	int x = GET_X_LPARAM(lParam);
+	int y = GET_Y_LPARAM(lParam);
 
 	POINT pt;
-	pt.x=x;
-	pt.y=y;
+	pt.x = x;
+	pt.y = y;
+	// convert point in scrolled view to logical coordinate
 	PHDToL(pt);
 	/*Previously selected*/
-	RECT rold;
-	map<long,RECT>::iterator sit=phd._ProcessAreas.find(phd._selected);
-	if(sit!=phd._ProcessAreas.end())
-	{
-		//CreateScreenBuffer();
-		rold=sit->second;
-		PHLToD(rold);
-		//InvalidateRect(&r);
-	}
 	
-	for(map<long,RECT>::iterator it=phd._ProcessAreas.begin();
-		it!=phd._ProcessAreas.end();it++)
-	{
-		if(PtInRect(&it->second,pt))
+	RECT rold;
+
+	map<long, RECT>::iterator sit = phd._ProcessAreas.find(phd._selected);
+		if (sit != phd._ProcessAreas.end())
 		{
-			phd._selected=it->first;
-			
-			CreateScreenBuffer();
-			RECT r=it->second;
+			rold = sit->second;
+			PHLToD(rold);
+		}
+
+	for (map<long, RECT>::iterator it = phd._ProcessAreas.begin();
+		it != phd._ProcessAreas.end(); it++)
+	{
+		//found process right clicked on
+		if (PtInRect(&it->second, pt))
+		{
+			phd._selected = it->first;
+
+			DrawProcess(it->first, it->second);
+			RECT r = it->second;
 			PHLToD(r);
 			InvalidateRect(&r);
-			InvalidateRect(&rold);
+			if (sit != phd._ProcessAreas.end())
+			{
+				DrawProcess(sit->first, sit->second);
+				InvalidateRect(&rold);
+			}
 			UpdateWindow();
 			CMenu menu;
-			menu.LoadMenu( IDR_CONTEXT_MENU);
-			CMenuHandle mh=menu.GetSubMenu(0);
+			menu.LoadMenu(IDR_CONTEXT_MENU);
+			CMenuHandle mh = menu.GetSubMenu(0);
 			// convert to point clicked to screen coordinates/ hwnd needs to handle message
 			POINT menupt;
-			menupt.x=x;
-			menupt.y=y;
+			menupt.x = x;
+			menupt.y = y;
 			ClientToScreen(&menupt);
-			TrackPopupMenu((HMENU)mh, TPM_LEFTALIGN, 
-				menupt.x, menupt.y,0, ph_instance._hWnd,NULL);
+			TrackPopupMenu((HMENU)mh, TPM_LEFTALIGN,
+				menupt.x, menupt.y, 0, ph_instance._hWnd, NULL);
 			return TRUE;
 		}
 	}
-	phd._selected=0;
-	CreateScreenBuffer();
-	InvalidateRect(&rold);
-	UpdateWindow();
+	//clicked in white space
+	phd._selected = 0;
+	if (sit != phd._ProcessAreas.end())
+	{
+		DrawProcess(sit->first, sit->second);
+		InvalidateRect(&rold);
+		UpdateWindow();
+	}
 	::PostMessage(ph_instance._hWnd, UWM_DOWNLOAD_PROGRESS, 4, 0);
 	SetFocus();
 	return TRUE;
@@ -212,19 +228,20 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 		// ANSI text to the Clipboard.
 		HGLOBAL hClipboardData;
 
-		if (phd._selected>0)
+		if (phd._selected < 1 && phd._mouseover < 1)
+			return 0;
 			hClipboardData = GlobalAlloc(GMEM_DDESHARE,
 			phti._ps.size() + 1);
-		else if (phd._mouseover>0)
+		/*else if (phd._mouseover>0)
 			hClipboardData = GlobalAlloc(GMEM_DDESHARE,
-			phti._ps2.size() + 1);
+			phti._ps2.size() + 1);*/
 		
-		if (phd._selected>0)
+		//if (phd._selected>0)
 		hClipboardData = GlobalAlloc(GMEM_DDESHARE,
 			phti._ps.size() + 1);
-		else
+		/*else
 			hClipboardData = GlobalAlloc(GMEM_DDESHARE,
-			phti._ps.size() + 1);
+			phti._ps.size() + 1);*/
 		// Calling GlobalLock returns to me a pointer to the 
 		// data associated with the handle returned from 
 		// GlobalAlloc
@@ -234,10 +251,10 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 		// At this point, all I need to do is use the standard 
 		// C/C++ strcpy function to copy the data from the local 
 		// variable to the global memory.
-		if (phd._selected>0)
+		//if (phd._selected>0)
 			strcpy(pchData, LPCSTR(phti._ps.c_str()));
-		else if (phd._mouseover>0)
-			strcpy(pchData, LPCSTR(phti._ps2.c_str()));
+		/*else if (phd._mouseover>0)
+			strcpy(pchData, LPCSTR(phti._ps2.c_str()));*/
 		// Once done, I unlock the memory - remember you 
 		// don't call GlobalFree because Windows will free the 
 		// memory automatically when EmptyClipboard is next 
@@ -354,12 +371,17 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 		char Path[300];
 		int length = GetWindowTextLength(ph_instance._hWndCombo2);
 		if (length>0)
-			GetWindowText(ph_instance._hWndCombo2, Path, length+1);
+			GetWindowText(ph_instance._hWndCombo2, Path, length + 1);
+		else
+		{
+			phd.filter_exec = false;
+			 return false;
+		}
 		DWORD dwCRC=-1;
 #if defined (_WIN64)
 		CCrc32Static::FileCrc32Win32(Path, dwCRC);
 #else
-		CCrc32Static::FileCrc32Assembly(dlg.m_szFileName, dwCRC);
+		CCrc32Static::FileCrc32Assembly(Path, dwCRC);
 #endif
 		
 		phd.filterCRC = dwCRC;
@@ -514,10 +536,12 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 //			COMMAND_HANDLER(ID_USERFILTER_COMBO, CBN_SELCHANGE, OnComboChange)
 		int sel=m_Combo.GetCurSel();
 		char lbtext[300];
-		if (wID == ID_PLACEHOLDER)
+		if (wID == ID_USERFILTER_COMBO)
 			//int LBTlen=m_Combo.GetLBTextLen(sel);
-		m_Combo.GetLBText(sel, lbtext);
-		ParseQry();//lbtext);
+		{
+			//m_Combo.GetLBText(sel, lbtext);
+			ParseQry();//lbtext);
+		}
 		return 0;
 	}
 	LRESULT CMainFrame::OnCommandEnter(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
