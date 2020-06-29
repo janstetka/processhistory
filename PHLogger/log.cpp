@@ -12,6 +12,8 @@
 #include "boost\thread\mutex.hpp"
 using namespace boost;
 #endif
+#include <queue>
+#include <..\PHQuery\ph.h>
 
 using namespace std;
 using namespace boost::posix_time;
@@ -23,10 +25,52 @@ extern CPHLogger logger;
 map<long,CProcessInfo> process_map;
 
 mutex db_mutex;
+extern mutex start_mtx, stop_mtx;
+extern condition_variable cv_start, cv_stop;
+extern queue<long> start_queue, stop_queue;
+extern PH ph_instance;
+void StartEvent()
+{
+	while (logger._Refresh > -1) {
+		long PID;
+		{
+		unique_lock<mutex> lk(start_mtx);
+		while (start_queue.empty())
+			cv_start.wait(lk);
+		if (start_queue.empty())
+			continue;
+		if (start_queue.size() > 1)
+			::SetWindowText(ph_instance._hWndStatusBar, ("STARTQ "+boost::lexical_cast<string>(start_queue.size())).c_str()); 
+		PID = start_queue.front();
+		::SetWindowText(ph_instance._hWndStatusBar, ("START PID " + boost::lexical_cast<string>(PID)).c_str());
+		start_queue.pop();
+	}
+		logger.StartEvent(PID);
+	}
+}
+void StopEvent()
+{
+	while (logger._Refresh > -1) {
+		long PID;
+		{
+			unique_lock<mutex> lk(stop_mtx);
+			while (stop_queue.empty())
+				cv_stop.wait(lk);
+			if (stop_queue.empty())
+				continue;
+			if (stop_queue.size() > 1)
+				::SetWindowText(ph_instance._hWndStatusBar, ("STOPQ "+boost::lexical_cast<string>(stop_queue.size())).c_str());
+			PID = stop_queue.front();
+			stop_queue.pop();
+		}
+		logger.StopEvent(PID);
+	}
+}
 
 /*Process Start*/
 void CPHLogger ::StartEvent( long lPId)
 {
+	
 	//PHMessage("Start: "+lexical_cast<string>(lPId));
 
 	CProcessInfo clStart;

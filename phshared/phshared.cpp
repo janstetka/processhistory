@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <tlhelp32.h>
+//#include <tlhelp32.h>
 //#include "Crc32Static.h"
 
 using namespace boost::posix_time;
@@ -29,7 +29,7 @@ using namespace std;
 /*Win32 Start*/
 
 
-void GetExecutableName(long lPID, string & ExecPath)
+/*void GetExecutableName(long lPID, string & ExecPath)
 {
 	EnablePrivilege(SE_DEBUG_NAME);
 		HANDLE        hModuleSnap = NULL; 
@@ -67,13 +67,15 @@ void GetExecutableName(long lPID, string & ExecPath)
 			CloseHandle (hModuleSnap);
 		return ; 
 }
-/*Win32 End*/
+Win32 End*/
 
 void GetModulePath(string & Folder)
 {
 	int iSt;
 	string ExecImagePath	;
-	GetExecutableName(GetCurrentProcessId(),ExecImagePath);
+	TCHAR szFileName[MAX_PATH];
+	GetModuleFileName(NULL,szFileName,MAX_PATH);
+	ExecImagePath = szFileName;
 	iSt=ExecImagePath.find_last_of('\\');
 	Folder=ExecImagePath.substr(0,iSt+1);
 }

@@ -54,7 +54,7 @@ void LeftRightThread(LRTdata lrt)
 		if (FilterUser())
 			os << " AND USERID=" << phd.filterUserID;
 		if (FilterExec())
-			os << " AND CRC=" << phd.filterCRC;
+			os << " AND PathID=" << phd.filterPathID;
 		os << ";";
 		PHJump(os.str(), lrt.td);
 	}
@@ -320,7 +320,7 @@ string ModifiedConstruct(ptime Begin,ptime end)
 	if (phd.filter_exec || phd.filterUserID > 0)
 			os << " ) ";
 	if(phd.filter_exec)
-		os<< " AND CRC="<<phd.filterCRC<<" ";
+		os<< " AND PathID="<<phd.filterPathID<<" ";
 	if(phd.filterUserID>0)
 		os<<" AND USERID="<<phd.filterUserID<<" ";
 	SQL+=os.str();
@@ -704,7 +704,7 @@ LRESULT CMainFrame::GoToMostRecent(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 	if (FilterUser() && FilterExec())
 		os << " AND ";
 		if(FilterExec())
-		os << " CRC=" << phd.filterCRC;
+		os << " PathID=" << phd.filterPathID;
 	os << ";";
 	{
 		lock_guard<mutex> sl(db_mutex);

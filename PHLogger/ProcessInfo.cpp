@@ -8,7 +8,7 @@
 #include "boost/date_time/c_local_time_adjustor.hpp"
 #include "boost/algorithm/string.hpp"
 #include <set>
-#include "..\phshared\Crc32Static.h"
+//#include "..\phshared\Crc32Static.h"
 #include "..\background\phacker.h"
 #include "nowide\convert.hpp"
 #if defined (_WIN64)
@@ -95,8 +95,17 @@ void CProcessInfo::GetExecutableImage()
 {
 	int i=0;
 	string path;
-	GetExecutableName(_PId,path);		/*END: TIME CRITICAL*/
-	
+	//GetExecutableName(_PId,path);		/*END: TIME CRITICAL*/
+
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, _PId);
+
+	PWSTR pCL = PHackGetImageFile(_PId, hProcess);
+	CloseHandle(hProcess);
+	if (pCL != 0)
+	{
+		path = nowide::narrow(pCL);
+		free(pCL);
+	}
 	if(path.empty())
 	{
 		//PHMessage("Failed processinfo get executable image "+ lexical_cast<string>(_PId));
@@ -114,14 +123,14 @@ void CProcessInfo::GetExecutableImage()
 		_path=path;
 		//cout<<"path: "<<_path<<endl;
 	}
-		
-	DWORD dwCRC;
+		//TODO 2020 don't gather CRCS as excessive reads or do less
+	/*DWORD dwCRC;
 #if defined (_WIN64)
 	CCrc32Static::FileCrc32Win32(_path.c_str(),dwCRC);
 #else
 	CCrc32Static::FileCrc32Assembly(_path.c_str(),dwCRC);
 #endif
-		_CRC=dwCRC;
+		_CRC=dwCRC;*/
 	}
 
 	
@@ -137,15 +146,15 @@ void CProcessInfo::SaveProcess(ptime ExitTime)
 	if(PathID==-1)
 		return;
 
-	clSQL<<"INSERT INTO Process(CreationTime,PathID,CLID,UserID,CRC,Destruction) VALUES (JULIANDAY('" 	<< GetStartTime()
-	<<"'),"	<<PathID;
+	clSQL<<"INSERT INTO Process(CreationTime,PathID,CLID,UserID,Destruction) VALUES (JULIANDAY('" 	<< GetStartTime()
+	<<"'),"	<<PathID;//CRC,
 	
 	long CLID=getclid(_commandline);
 	//if(CLID==-1)
 	//	return;
 	clSQL<<","<<CLID;
 	clSQL<<","<<_UserID;
-	clSQL<<","<<_CRC;
+	/*clSQL<<","<<_CRC;*/
 	clSQL<<","<<"JULIANDAY('"	<<	BoostToSQLite(ExitTime);
 	clSQL<<"'));";
 	

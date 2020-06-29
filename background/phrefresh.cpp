@@ -1,7 +1,7 @@
 #include <map>
 #include <set>
 #include "..\phlogger\ProcessInfo.h"
-#include <tlhelp32.h>
+//#include <tlhelp32.h>
 
 using namespace std;
 
@@ -10,95 +10,119 @@ using namespace std;
 #include "..\phquery\PH.h"
 #include "..\ProcessHistory\Progress.h"
 #include "boost/date_time/posix_time/posix_time.hpp"
-
+#include "..\background\phacker.h"
+#include <thread>
+#include <mutex>
+#include <queue>
 using namespace boost::posix_time;
 
 extern CPHLogger logger;
 extern map<long,CProcessInfo> process_map;
 extern PH ph_instance;
-
+void WorkerThread();
+	set<long> OldProcesses;
+	//set<long> ignore;
+condition_variable cv,cv_start,cv_stop;
+mutex m_mutex,start_mtx,stop_mtx;
 void RefreshThread()
 {
 	CProgressBarCtrl m_sBar;
 	m_sBar.Attach(ph_instance._hWndProgress);
-LoadPathData(m_sBar);
-	LoadCommandLines(m_sBar);
+	LoadPathData(m_sBar);
+	//LoadCommandLines(m_sBar);//TODO 2020 don't read all these in / generally could minimise reads, lots of depreciated in compile 
+	PhpEnablePrivileges();
 
-	set<long> OldProcesses;
-	set<long> ignore;
-	int correction=0;
+	
 	logger.procdb = OpenDB();
-	while (logger._Refresh>-1)
+thread worker(WorkerThread);
+	while (logger._Refresh > -1)
 	{
-		Sleep(logger._Refresh-correction);
-		ptime rb = microsec_clock::local_time();
-		HANDLE         hProcessSnap = NULL; 
-		PROCESSENTRY32 pe32      = {0}; 
- 
+		Sleep(logger._Refresh);
+		//
+		lock_guard<mutex> lock(m_mutex);
+		cv.notify_one();
+	}
+}
+mutex worker_mtx;
+extern void StartEvent();
+extern void StopEvent();
+
+queue<long> start_queue,stop_queue;
+
+void WorkerThread()
+{
+	thread start_e(&StartEvent);
+	thread stop_e(&StopEvent);
+
+	set<long> procs;
+	while (logger._Refresh > -1) {
+		{
+			unique_lock<mutex> lk(m_mutex);
+			cv.wait(lk);
+		}
+		//lock_guard<mutex> sl(worker_mtx);
+ptime rb = microsec_clock::local_time();
+
 		/*  Take a snapshot of all processes in the system. */
 
-		hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); 
+		 //  ntquery is excessively page faulting 
 
-		if (hProcessSnap == INVALID_HANDLE_VALUE) 
-			return ;
- 
-		/*  Fill in the size of the structure before using it. */
-
-		pe32.dwSize = sizeof(PROCESSENTRY32); 
- 
-		/*  Walk the snapshot of the processes, and for each process, 
+		/*  Walk the snapshot of the processes, and for each process,
 		display information. */
 
-		if (Process32First(hProcessSnap, &pe32)) 
-		{         
+
+		long ProcessID;
+		ProcessID = ProcessHackerInitialGetProcess();
+		if (ProcessID > -1)
+		{
 			set<long> Processes;
-			while (Process32Next(hProcessSnap, &pe32))
+			do
 			{
-				Processes.insert(pe32.th32ProcessID);
-				if (process_map.find(pe32.th32ProcessID) == process_map.end())//if not already got this one - log
-						logger.StartEvent(pe32.th32ProcessID);
-			}
-			
+				Processes.insert(ProcessID);
+				
+				if (process_map.find(ProcessID) == process_map.end())//if not already got this one - log
+				{
+					//, ProcessID);
+					HANDLE hProcess = OpenProcess(
+						PROCESS_QUERY_INFORMATION,FALSE, ProcessID);
+					if (hProcess != NULL)
+					{
+						if (procs.find(ProcessID) == procs.end()) //TODO  not elevated  PHack is using PROCESS_QUERY_LIMITED_INFORMATION,
+						{
+							unique_lock<mutex> lock(start_mtx);
+							start_queue.push(ProcessID);
+							cv_start.notify_one();
+							procs.insert(ProcessID);
+						}
+						CloseHandle(hProcess);
+					}
+
+				}
+				ProcessID = ProcessHackerGetNextProcess();
+			} while (ProcessID > -1);
+
 			//result present in first but not second
 			set<long> result;
-			set_difference(OldProcesses.begin(), OldProcesses.end(), Processes.begin(), Processes.end(),inserter(result, result.end()));
-			
-			
+			set_difference(OldProcesses.begin(), OldProcesses.end(), Processes.begin(), Processes.end(), inserter(result, result.end()));
+
+
 			set<long>::iterator it;
 			for (it = result.begin(); it != result.end(); it++)
 			{
-				logger.StopEvent(*it);
-				ignore.erase(*it);
+				if(procs.find(*it)!=procs.end())
+					procs.erase(*it);
+				unique_lock<mutex> lock(stop_mtx);
+				stop_queue.push(*it);
+				cv_stop.notify_one();
 			}
-			
-			OldProcesses=Processes;
-		} 
-		
+
+			OldProcesses = Processes;
+		}
+ProcessHackerCleanUp();
+ptime re = microsec_clock::local_time();
+		time_duration rtd= re - rb;
+		::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" refresh#"+ boost::lexical_cast<string>(procs.size())+"pm# "+ boost::lexical_cast<string>(process_map.size())).c_str());
+	}
 		/* Do not forget to clean up the snapshot object. */
 
-		CloseHandle (hProcessSnap); 
-		ptime re = microsec_clock::local_time();
-		time_duration rtd= re - rb;
-		
-		correction = 0;
-		//ms
-		//don't wait
-		if (((rtd.seconds() < 1 && rtd.fractional_seconds() / 1000 > logger._Refresh) || rtd.seconds()>1) && logger._Refresh < 1000)
-			correction = logger._Refresh;
-		// shorten
-		if (rtd.seconds() < 1 && logger._Refresh <1000 && rtd.fractional_seconds() / 1000 < logger._Refresh)
-			correction = rtd.fractional_seconds() / 1000;
-			 
-		//Over a second
-
-		//refresh took longer than a second - don't wait
-		if (rtd.seconds() > 0 && logger._Refresh >= 1000 && rtd>seconds(logger._Refresh/1000))
-			correction = logger._Refresh;
-		//refresh took less than a second, shorten the refresh interval	
-		//if (  (logger._Refresh) >rtd)
-		//	correction = rtd.fractional_seconds() / 1000;		
-
-		//::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" correction"+lexical_cast<string>(correction)).c_str());
-
 	}
-}

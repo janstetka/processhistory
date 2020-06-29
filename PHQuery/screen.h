@@ -65,7 +65,8 @@ class PHDisplay
 	bool	filter_exec;
 
 	int filterUserID;
-	unsigned long filterCRC;
+	//unsigned long filterCRC;
+	int filterPathID;
 	bool _process_detail;
 	//float scale; //ms represented by a pixel
 };

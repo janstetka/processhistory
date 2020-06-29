@@ -227,7 +227,7 @@ void PHTimeInfo::DisplayInfo()
 	string bintxt,total_duration;
 	PHProcess pclProcess;
 	time_duration ProcessDuration;
-	unsigned long CRC;
+	//unsigned long CRC;
 	 if (phd._mouseover>0)
 		_ID=phd._mouseover;
 	
@@ -258,7 +258,7 @@ void PHTimeInfo::DisplayInfo()
 		sqlite3_finalize(stmt);
 		
 		ostringstream os2;
-		os2 << "SELECT UserName,CRC FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= ";
+		os2 << "SELECT UserName FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= ";
 
 			os2 << _ID;
 
@@ -272,7 +272,7 @@ void PHTimeInfo::DisplayInfo()
 		{
 			user=sqlite3_column_text(stmt2,0);
 			usertxt=(char*)user;
-			CRC=sqlite3_column_int(stmt2,1);
+			//CRC=sqlite3_column_int(stmt2,1);
 		}
 		sqlite3_finalize(stmt2);
 		
@@ -326,8 +326,8 @@ void PHTimeInfo::DisplayInfo()
 	
 	<<"User: "<<usertxt;
 
-	dlgos<<"\r\n"<<"Path: "<<pathtxt<<"\r\n"<<"Command line: "<<cltxt<<"\r\n"<<Product<<" "<<Description
-	<<"\r\n"<<bintxt<<"\r\n"<<"CRC: "<<CRC;
+	dlgos << "\r\n" << "Path: " << pathtxt << "\r\n" << "Command line: " << cltxt << "\r\n" << Product << " " << Description
+		<< "\r\n" << bintxt << "\r\n";// << "CRC: " << CRC;
 
 
 		_ps = dlgos.str();

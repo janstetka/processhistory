@@ -67,40 +67,50 @@ long getclid(string cl)
 	map<string,long>::iterator path_it=PHCLs.find(cl);
 	long PathID=-1;
 
-	if(path_it==PHCLs.end())
+	if (path_it == PHCLs.end())// if not in memory check disk
 	{
-		sqlite3 * db;	
-
-		db=OpenDB();
-		//%Q to remove apostrophes
+		string selectSQL = "SELECT ID FROM CommandLines WHERE CommandLine=" + cl + ";";
+		sqlite3* db = OpenDB();
+		sqlite3_stmt* stmt;
+		if (sqlite3_prepare(db, selectSQL.c_str(), -1, &stmt, NULL) != SQLITE_OK)
+			DBError(sqlite3_errmsg(db), __LINE__, __FILE__);//TODO whats the select equivalent of %Q
+		if (sqlite3_step(stmt) == SQLITE_ROW)
 		{
-		//mutex::scoped_lock lock(db_mutex);
-			lock_guard<mutex> sl(db_mutex);
-			char* SQL = sqlite3_mprintf("INSERT INTO CommandLines(CommandLine) VALUES(%Q)", cl.c_str());
-		
-		if(SQLITE_OK!=sqlite3_exec(db,SQL,0,0,0))
-			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);		
-		else
-			PathID=sqlite3_last_insert_rowid(db);
+			long ID = sqlite3_column_int(stmt, 1);
+			PHCLs.insert(pair<string, long>(cl, ID));
 		}
+		else//if not on disk persist
+		{
+			//db=OpenDB();
+			//%Q to remove apostrophes
+			{
+				//mutex::scoped_lock lock(db_mutex);
+				lock_guard<mutex> sl(db_mutex);
+				char* SQL = sqlite3_mprintf("INSERT INTO CommandLines(CommandLine) VALUES(%Q)", cl.c_str());
 
-		sqlite3_close(db);
+				if (SQLITE_OK != sqlite3_exec(db, SQL, 0, 0, 0))
+					DBError(sqlite3_errmsg(db), __LINE__, __FILE__);
+				else
+					PathID = sqlite3_last_insert_rowid(db);
+			}
 
-		if(PathID<1)
-			PHTrace("Invalid Command Line ID",__LINE__,__FILE__);
-			
-		PHCLs.insert(pair<string,long>(cl,PathID));
+			sqlite3_close(db);
+
+			if (PathID < 1)
+				PHTrace("Invalid Command Line ID", __LINE__, __FILE__);
+
+			PHCLs.insert(pair<string, long>(cl, PathID));
+		}
 	}
 	else
-		PathID=path_it->second;
-		
+		PathID=path_it->second;		
 	
 	return PathID;
 }
 
 #include "..\ProcessHistory\Progress.h"
 
-void LoadCommandLines(CProgressBarCtrl m_sBar)
+/*void LoadCommandLines(CProgressBarCtrl m_sBar)
 {
 	sqlite3 * db=OpenDB();
 	sqlite3_stmt* stmt;
@@ -123,4 +133,4 @@ void LoadCommandLines(CProgressBarCtrl m_sBar)
 	m_sBar.SetPos(0);
 	sqlite3_finalize(stmt);
 	sqlite3_close(db);
-}
+}*/

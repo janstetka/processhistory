@@ -364,7 +364,7 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 			return false;
 		}
 	}
-#include "..\..\phshared\Crc32Static.h"
+//#include "..\..\phshared\Crc32Static.h"
 	set<string> PathSet;
 	bool /*CMainFrame::*/FilterExec()
 	{
@@ -377,24 +377,25 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 			phd.filter_exec = false;
 			 return false;
 		}
-		DWORD dwCRC=-1;
+		/*DWORD dwCRC=-1;
 #if defined (_WIN64)
 		CCrc32Static::FileCrc32Win32(Path, dwCRC);
 #else
 		CCrc32Static::FileCrc32Assembly(Path, dwCRC);
 #endif
 		
-		phd.filterCRC = dwCRC;
+		phd.filterCRC = dwCRC;*/
 		lock_guard<mutex> sl(db_mutex);
 		ostringstream os2;
-		os2 << "SELECT ID FROM Process WHERE CRC=" << phd.filterCRC << ";";
+		os2 << "SELECT Paths.ID FROM Process JOIN Paths ON Process.PathID = Paths.ID WHERE Paths.Path=" << Path << ";";
 		sqlite3 *db2 = OpenDB();
 		sqlite3_stmt* stmt2;
 		if (sqlite3_prepare(db2, os2.str().c_str(), -1, &stmt2, NULL) != SQLITE_OK)
-		DBError(sqlite3_errmsg(db2), __LINE__, __FILE__);
+			DBError(sqlite3_errmsg(db2), __LINE__, __FILE__);
 		if (sqlite3_step(stmt2) == SQLITE_ROW)
 		{
-			if (sqlite3_column_int(stmt2, 0) > 0)
+			phd.filterPathID = sqlite3_column_int(stmt2, 0);
+			if (phd.filterPathID > 0)
 			{
 				phd.filter_exec = true;
 				sqlite3_finalize(stmt2);

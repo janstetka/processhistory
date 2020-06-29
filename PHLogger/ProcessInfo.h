@@ -35,7 +35,7 @@ private:
 	bool _bValid ;
 	std::string _User;
 	FILETIME _WIN32Time;
-	unsigned long _CRC;
+	//unsigned long _CRC;
 };
 
 #endif

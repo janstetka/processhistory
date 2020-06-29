@@ -33,9 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\background\CVERSION.CPP">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\PHQuery\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,12 +66,6 @@
     <ClCompile Include="..\phshared\phshared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\sqlite\sqlite3.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\phshared\Crc32Static.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\PHLogger\DBTables.cpp">
       <Filter>Source Files\background</Filter>
     </ClCompile>
@@ -98,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="..\background\phacker.c">
       <Filter>Source Files\background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sqlite\sqlite3.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@ using namespace std;
 
 map<string,long> PHPaths;
 
-void LoadPathData();
+//void LoadPathData();
 
 void CPHLogger::StartProcessHistory()
 {	
