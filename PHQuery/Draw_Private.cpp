@@ -19,15 +19,15 @@ RECT  PHDisplay::CalculateRect(ptime Start,ptime End ,ptime Left,int iLine)
 
 	time_duration clEventTime=Start-Left;
 		/*Calculate the total minutes*/
-		long lxStartPos=
+		long lxStartPos=static_cast<long>(
 			(clEventTime.hours()*3600)+(clEventTime.minutes()*60) 
-			+ (clEventTime.seconds());
+			+ (clEventTime.seconds()));
 
 		long lxEndPos;
 
 			clEventTime=End-Left;
-			lxEndPos=(clEventTime.hours()*3600)+(clEventTime.minutes()*60)
-				+ (clEventTime.seconds());
+			lxEndPos= static_cast<long>((clEventTime.hours()*3600)+(clEventTime.minutes()*60)
+				+ (clEventTime.seconds()));
 
 		RECT rcEvent;
 		rcEvent.left=lxStartPos;

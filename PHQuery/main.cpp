@@ -1,6 +1,6 @@
 #include "resource.h"
 #include "..\processhistory\mainfrm.h"
-
+#include "..\phacker.h"
 CAppModule _Module;
 
 int Run(LPTSTR /*lpstrCmdLine*/ = NULL, int nCmdShow = SW_SHOWDEFAULT)
@@ -45,6 +45,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	
 	//phd.hInst=hInstance;	
 	//phd._WinLeft=second_clock::local_time();
+	ProcessHackerStart(hInstance);
 	logger._Refresh = 1000;
 	//if (lpstrCmdLine!=NULL) TODO 2020 do this via gui settings
 	//	logger._Refresh = boost::lexical_cast<int>(string(lpstrCmdLine));

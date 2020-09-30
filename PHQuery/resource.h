@@ -56,6 +56,8 @@
 #define IDC_BUTTON1                     1087
 #define IDC_CHECK1                      1089
 #define IDC_COMBO1                      1091
+#define IDC_EDIT1                       1092
+#define IDC_REFRESH                     1092
 #define ID_QUERY_DATEANDTIME            40001
 #define ID_QUERY_REFRESH                40002
 #define ID_VIEW_PAGES                   40003
@@ -141,14 +143,16 @@
 #define ID_PH_EXPORT                    40104
 #define ID__COPYTEXT                    40105
 #define ID_CONTEXT_SETUSERFILTER        40106
+#define ID_CONTEXT_GOTOPARENT           40107
+#define ID_PH_SETTINGS                  40108
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         40107
-#define _APS_NEXT_CONTROL_VALUE         1092
+#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_COMMAND_VALUE         40109
+#define _APS_NEXT_CONTROL_VALUE         1093
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

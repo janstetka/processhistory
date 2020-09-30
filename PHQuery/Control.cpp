@@ -6,15 +6,8 @@
 #include "query.h"
 #include "..\phshared\PHShared.h"
 #include "nowide\convert.hpp"
-#if defined (_WIN64)
 #include <thread>
 #include <mutex>
-#else
-#include "boost\thread\mutex.hpp"
-#include <boost\thread\lock_guard.hpp> 
-#include <boost\thread\thread.hpp>
-using namespace boost;
-#endif
 
 using namespace std;
 using namespace boost::posix_time;
@@ -251,15 +244,15 @@ m_sBar.SetPaneText(ID_PANE_2, "ALL" );
    
    // Initialize GDI+.
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-//#if defined (_WIN64)
-	PWSTR pCL = ProcessHackerStart();
+
+	/*PWSTR pCL = ProcessHackerStart();
 	
 	if (pCL != 0)
 	{
 		ProcessHackerVer = nowide::narrow(pCL);
 		free(pCL);
-	}
-//#endif
+	}*/
+
 	ph_instance._hWndProgress = m_sBar.m_Progress;
 	logger.StartProcessHistory();
 	FillUserList();
@@ -435,7 +428,7 @@ void Worker10(Worker4Thread w4t)
 		}
 		sqlite3_finalize(stmt);
 		
-		w4t.m_sBar->ProgSetPos(hitr->time_of_day().hours());
+		w4t.m_sBar->ProgSetPos(static_cast<int>(hitr->time_of_day().hours()));
 	}
 	sqlite3_close(db);	
 	w4t.m_sBar->ProgSetPos(0);
@@ -581,7 +574,7 @@ LRESULT CMainFrame::OnExecRunSel(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWnd
 		{
 			if ( exists(qpit->second))
 			{
-			if((int)ShellExecute(NULL, "Open",qpit->second.c_str(),NULL,NULL,SW_SHOWDEFAULT)<33)
+			if(!ShellExecute(NULL, "Open",qpit->second.c_str(),NULL,NULL,SW_SHOWDEFAULT))
 				PHTrace(Win32Error(),__LINE__,__FILE__);
 			}
 			else
@@ -605,8 +598,7 @@ LRESULT CMainFrame::OnExecOCF(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 			command +=qpit->second;
 			
 			// open the containing folder
-			if((int)ShellExecute(NULL, "Open", "Explorer", command.c_str(), 
-                                                        NULL, SW_SHOWDEFAULT)<33)
+			if(!ShellExecute(NULL, "Open", "Explorer", command.c_str(), NULL, SW_SHOWDEFAULT))
 				PHTrace(Win32Error(),__LINE__,__FILE__);
 			}
 			else
@@ -746,7 +738,7 @@ LRESULT CMainFrame::GoToMostRecent(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 	return 0;
 }
 #include "atldlgs.h"
-#include "..\phshared\Crc32Static.h"
+
 LRESULT CMainFrame::OnFilterExecutable(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	char User[300];
@@ -832,6 +824,15 @@ LRESULT CMainFrame::OnFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/,
 		if(phts.UpdateWindow()==0)
 		PHTrace(Win32Error(), __LINE__, __FILE__);
 	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnSettings(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	SettingsCtrl ctrl;
+	ctrl._Refresh = boost::lexical_cast<string>(logger._Refresh);
+	ctrl.DoModal();
+	logger._Refresh = boost::lexical_cast<int>(ctrl._Refresh);
 	return 0;
 }
 //doesn't behave quite right when no results leaves last query on screen but doesn't redraw it.

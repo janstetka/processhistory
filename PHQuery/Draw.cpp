@@ -160,8 +160,8 @@ void PHScroll::DrawProcess(long lID, RECT rcEvent)
 				rcEvent.left += 4;
 
 			if (rcEvent.right - rcEvent.left>0)
-				if (_MemDC->DrawText(SystemName.c_str(), SystemName.length(), &rcEvent, DT_LEFT | DT_VCENTER | DT_SINGLELINE) == 0)
-					PHTrace(Win32Error(),__LINE__,__FILE__);
+				/*if (*/_MemDC->DrawText(SystemName.c_str(), static_cast<int>(SystemName.length()), &rcEvent, DT_LEFT | DT_VCENTER | DT_SINGLELINE); //== 0)
+					//PHTrace(Win32Error(),__LINE__,__FILE__);
 			
 			if(phd._selected==lID)
 				_MemDC->SetBkColor(sel_cr);
@@ -236,7 +236,7 @@ void PHDisplay::ReadPaths()// base on paths.id avoids duplication
 			 if(ver_it==_EXEImages.end())
 			 {
 				string Product,Description;
-				GetVersionInfo(Product,Description,FileName);	 //TODO: See what PHacker does for this to reduce overall code.
+				GetVersionInfo(Product,Description,FileName);	 // PHacker 
 				if(!Product.empty())// || !Description.empty())
 				{
 					_EXEImages.insert(pair< long,string>(PathID,Product));
