@@ -1,11 +1,7 @@
-#if defined (_WIN64)
 #include "ph.h"	
 #include "..\..\ProcessHacker\include\phappres.h"
-#else
-#include "c:\processhacker-2.28-src\phlib\include\ph.h"	
-#include "C:\processhacker-2.28-src\ProcessHacker\include\phappres.h"
-#endif
 #include "phacker.h"
+#include "..\..\phlib\include\lsasup.h"
 #include <wchar.h>
 
 
@@ -18,30 +14,9 @@ PWSTR PhpGetStringOrNa(
     else
         return L"N/A";
 }
-PWSTR ProcessHackerStart()
+VOID ProcessHackerStart(HINSTANCE hi)
 {
-	PhInitializePhLib();
-	PPH_STRING appName;
-
-#if (PHAPP_VERSION_REVISION != 0)
-	appName = PhFormatString(
-		L"Process Hacker %u.%u (r%u)",
-		PHAPP_VERSION_MAJOR,
-		PHAPP_VERSION_MINOR,
-		PHAPP_VERSION_REVISION
-		);
-#else
-	appName = PhFormatString(
-		L"Process Hacker %u.%u",
-		PHAPP_VERSION_MAJOR,
-		PHAPP_VERSION_MINOR
-		);
-#endif
-	wchar_t * retval = calloc((ULONG)appName->Length, sizeof(wchar_t));
-
-	wcsncpy(retval, PhpGetStringOrNa(appName), (ULONG)appName->Length);
-	PhDereferenceObject(appName);
-	return retval;
+	NTSTATUS status=PhInitializePhLibEx(L"Process History",ULONG_MAX,hi,0,0);
 }
 
 PWSTR PHiGetCommandLine(HANDLE h)
@@ -83,7 +58,7 @@ PWSTR PHiGetCommandLine(HANDLE h)
 // DPCs, Interrupts and System Idle Process are not real.
 // Non-"real" processes can never be opened.
 #define PH_IS_REAL_PROCESS_ID(ProcessId) ((LONG_PTR)(ProcessId) > 0)
-PWSTR PHackGetImageFile(int ProcessId,HANDLE h )
+PWSTR PHackGetImageFile(HANDLE ProcessId,HANDLE h )
 {
 PROCESS_EXTENDED_BASIC_INFORMATION basicInfo;
     if (h)
@@ -92,15 +67,9 @@ PROCESS_EXTENDED_BASIC_INFORMATION basicInfo;
 
         if (NT_SUCCESS(PhGetProcessExtendedBasicInformation(h, &basicInfo)))
         {
-            //ProcessItem->IsProtectedProcess = basicInfo.IsProtectedProcess;
-           // ProcessItem->IsSecureProcess = basicInfo.IsSecureProcess;
-          //  ProcessItem->IsSubsystemProcess = basicInfo.IsSubsystemProcess;
-          //  ProcessItem->IsWow64 = basicInfo.IsWow64Process;
-          //  ProcessItem->IsWow64Valid = TRUE;
+
         }
     }
-		//NTSTATUS status;
-//PPH_STRING fileName2; //harddisk format
 
 // If we're dealing with System (PID 4), we need to get the
   // kernel file name. Otherwise, get the image file name. (wj32)
@@ -112,12 +81,12 @@ PROCESS_EXTENDED_BASIC_INFORMATION basicInfo;
             PPH_STRING fileName = NULL;
             PPH_STRING fileNameWin32 = NULL;
 
-            if (NT_SUCCESS(PhGetProcessImageFileNameByProcessId(ProcessId, &fileName)))
+            if (NT_SUCCESS(PhGetProcessImageFileNameByProcessId(ProcessId, &fileName)))//harddisk format
             {
-                // fileName2 = fileName;
+
             }
 
-            if (h && !basicInfo.IsSubsystemProcess)
+            if (h && !basicInfo.IsSubsystemProcess) // only works with a handle so not on other users processes unelevated
             {
                 PhGetProcessImageFileNameWin32(h, &fileNameWin32); // PhGetProcessImageFileName (dmex)
             }
@@ -138,38 +107,40 @@ PROCESS_EXTENDED_BASIC_INFORMATION basicInfo;
                     PhDereferenceObject(fileName);
                 return retval;
             }
-else
-return 0;
         }
     }
+     return 0;
 }
 
 
 PSYSTEM_PROCESS_INFORMATION process;
 PVOID processes;
 
-long ProcessHackerInitialGetProcess()
+VOID ProcessHackerInitialGetProcess(phqi* qi)
 {
 
-    //PVOID processes;
-    //PSYSTEM_PROCESS_INFORMATION process;InheritedFromUniqueProcessId;could use this
+//InheritedFromUniqueProcessId;TODO 2020 could use this
 	if (!NT_SUCCESS(PhEnumProcesses(&processes)))
-        return -1;
+        return ;
 		
 	process = PH_FIRST_PROCESS(processes);
 	if (process)
-		return (long)process->UniqueProcessId;
-	else
-		return -1;
+	{
+		qi->ID= process->UniqueProcessId;
+        PhLargeIntegerToLocalSystemTime(&qi->st, &process->CreateTime);
+        qi->parentID = process->InheritedFromUniqueProcessId;
+		}
 }
 
-long ProcessHackerGetNextProcess()
+VOID ProcessHackerGetNextProcess(phqi* qi)
 {
 	process = PH_NEXT_PROCESS(process);
 	if (process)
-		return (long)process->UniqueProcessId;
-	else
-		return -1;
+	{
+		qi->ID= process->UniqueProcessId;
+	PhLargeIntegerToLocalSystemTime(&qi->st, &process->CreateTime);
+    qi->parentID = process->InheritedFromUniqueProcessId;
+	}
 }
 void ProcessHackerCleanUp()
 {
@@ -210,8 +181,10 @@ VOID PhpEnablePrivileges(
         privileges->Privileges[6].Luid.LowPart = SE_RESTORE_PRIVILEGE;
         privileges->Privileges[7].Luid.LowPart = SE_SHUTDOWN_PRIVILEGE;
         privileges->Privileges[8].Luid.LowPart = SE_TAKE_OWNERSHIP_PRIVILEGE;
+/*        0xC0000262
 
-        NtAdjustPrivilegesToken(
+            STATUS_DRIVER_ORDINAL_NOT_FOUND expected unelevated*/
+        NTSTATUS nt=NtAdjustPrivilegesToken(
             tokenHandle,
             FALSE,
             privileges,
@@ -223,7 +196,7 @@ VOID PhpEnablePrivileges(
         NtClose(tokenHandle);
     }
 }
-BOOLEAN PHackerGetVersionInfo(PWSTR FileNameWin32, PWSTR *Product, PWSTR *Description, int *ProductLength,int *DescriptionLength)
+BOOLEAN PHackerGetVersionInfo(PWSTR FileNameWin32, PWSTR *Product, PWSTR *Description, SIZE_T *ProductLength, SIZE_T *DescriptionLength)
 {
     PH_IMAGE_VERSION_INFO VersionInfo;// = 0;
     // Version info.
@@ -248,54 +221,64 @@ BOOLEAN PHackerGetVersionInfo(PWSTR FileNameWin32, PWSTR *Product, PWSTR *Descri
     else
         return FALSE;
 }
-PWSTR PHackerGetUser(HANDLE QueryHandle,long ProcessId)//use existing code apart from the bit that requires globalalloc
-{ 
- if (
-                QueryHandle &&
-                ProcessId != SYSTEM_PROCESS_ID // System token can't be opened (dmex)
-                )
-            {
-                HANDLE tokenHandle;
+PWSTR PHackerGetUser(HANDLE QueryHandle, HANDLE ProcessId)//use existing code apart from the bit that requires globalalloc
+{
+    if (
+        QueryHandle &&
+        ProcessId != SYSTEM_PROCESS_ID // System token can't be opened (dmex)
+        )
+    {
+        HANDLE tokenHandle;
 
-                if (NT_SUCCESS(PhOpenProcessToken(
-                    QueryHandle,
-                    TOKEN_QUERY,
-                    &tokenHandle
-                    )))
+        if (NT_SUCCESS(PhOpenProcessToken(
+            QueryHandle,
+            TOKEN_QUERY,
+            &tokenHandle
+        )))
+        {
+
+            PPH_STRING UserName=NULL;
+
+            // User
+
+                    UserName=PhGetTokenUserString(tokenHandle,TRUE);
+
+                if (UserName )
                 {
-                    PTOKEN_USER tokenUser;
-                    TOKEN_ELEVATION_TYPE elevationType;
-                    MANDATORY_LEVEL integrityLevel;
-                    PWSTR integrityString;
+                    wchar_t* retval = calloc((ULONG)UserName->Length, sizeof(wchar_t));
 
-                    // User
-                    if (NT_SUCCESS(PhGetTokenUser(tokenHandle, &tokenUser)))
-                    {
-                        if (!RtlEqualSid(processItem->Sid, tokenUser->User.Sid))
-                        {
-                            PSID processSid;
+                    wcsncpy(retval, PhpGetStringOrNa(UserName), (ULONG)UserName->Length);
 
-                            // HACK (dmex)
-                            processSid = processItem->Sid;
-                            processItem->Sid = PhAllocateCopy(tokenUser->User.Sid, RtlLengthSid(tokenUser->User.Sid));
-                            PhFree(processSid);
+                    PhDereferenceObject(UserName);
+                    return retval;
+                }
+            //}
 
-                            PhMoveReference(&processItem->UserName, PhpGetSidFullNameCachedSlow(processItem->Sid));
+            // Elevation
+           /* if (NT_SUCCESS(PhGetTokenElevationType(tokenHandle, &elevationType)))
+            {
+                if (processItem->ElevationType != elevationType)
+                {
+                    processItem->ElevationType = elevationType;
+                    processItem->IsElevated = elevationType == TokenElevationTypeFull;
+                //    modified = TRUE;
+                }
+            }*/
+        }
+    }
+    return 0;
+}
 
-                            modified = TRUE;
-                        }
+SYSTEMTIME PHackerGetProcessTimesE(HANDLE h)
+{
+    KERNEL_USER_TIMES times;
+    SYSTEMTIME exit;
+    if (NT_SUCCESS(PhGetProcessTimes(h, &times)))
+        PhLargeIntegerToLocalSystemTime(&exit, &times.ExitTime);
+        return exit;    
+}
 
-                        PhFree(tokenUser);
-                    }
-
-                    // Elevation
-                    if (NT_SUCCESS(PhGetTokenElevationType(tokenHandle, &elevationType)))
-                    {
-                        if (processItem->ElevationType != elevationType)
-                        {
-                            processItem->ElevationType = elevationType;
-                            processItem->IsElevated = elevationType == TokenElevationTypeFull;
-                            modified = TRUE;
-                        }
-                    }
-					}
+NTSTATUS PHackerOpenProcess(HANDLE PID, ACCESS_MASK DesiredAccess,PHANDLE ph)
+{
+    return PhOpenProcess(ph, DesiredAccess, PID);
+}

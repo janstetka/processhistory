@@ -37,7 +37,7 @@ void GetVersionInfo(string & Product, string & Description, string path)
 				Description=p2;		*/
 
 	wchar_t* pProduct,*pDescription;
-	int ProductLength=0, DescriptionLength=0;
+	SIZE_T ProductLength=0, DescriptionLength=0;
 	if (TRUE == PHackerGetVersionInfo((PWSTR)nowide::widen(path.c_str()).c_str(), &pProduct, &pDescription,&ProductLength,&DescriptionLength))
 	{
 		//CloseHandle(hProcess);

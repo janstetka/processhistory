@@ -1,7 +1,6 @@
 #include <map>
 #include <set>
 #include "..\phlogger\ProcessInfo.h"
-//#include <tlhelp32.h>
 
 using namespace std;
 
@@ -17,19 +16,19 @@ using namespace std;
 using namespace boost::posix_time;
 
 extern CPHLogger logger;
-extern map<long,CProcessInfo> process_map;
+extern map<HANDLE,CProcessInfo> process_map;
 extern PH ph_instance;
 void WorkerThread();
-	set<long> OldProcesses;
-	//set<long> ignore;
+	set<HANDLE> OldProcesses;
+
 condition_variable cv,cv_start,cv_stop;
 mutex m_mutex,start_mtx,stop_mtx;
 void RefreshThread()
 {
 	CProgressBarCtrl m_sBar;
 	m_sBar.Attach(ph_instance._hWndProgress);
-	LoadPathData(m_sBar);
-	//LoadCommandLines(m_sBar);//TODO 2020 don't read all these in / generally could minimise reads, lots of depreciated in compile 
+	LoadPathData(m_sBar);//TODO 2020 don't read all these in
+	//LoadCommandLines(m_sBar); 
 	PhpEnablePrivileges();
 
 	
@@ -47,14 +46,15 @@ mutex worker_mtx;
 extern void StartEvent();
 extern void StopEvent();
 
-queue<long> start_queue,stop_queue;
+queue<qi> start_queue;
+queue<HANDLE> stop_queue;
 
 void WorkerThread()
 {
 	thread start_e(&StartEvent);
 	thread stop_e(&StopEvent);
 
-	set<long> procs;
+	//set<long> procs;
 	while (logger._Refresh > -1) {
 		{
 			unique_lock<mutex> lk(m_mutex);
@@ -71,46 +71,40 @@ ptime rb = microsec_clock::local_time();
 		display information. */
 
 
-		long ProcessID;
-		ProcessID = ProcessHackerInitialGetProcess();
-		if (ProcessID > -1)
+		//long ProcessID;
+		phqi startqi;
+		ProcessHackerInitialGetProcess(&startqi);
+		if (startqi.ID )
 		{
-			set<long> Processes;
+			set<HANDLE> Processes;
 			do
 			{
-				Processes.insert(ProcessID);
-				
-				if (process_map.find(ProcessID) == process_map.end())//if not already got this one - log
+				if (startqi.ID > (HANDLE)4)
 				{
-					//, ProcessID);
-					HANDLE hProcess = OpenProcess(
-						PROCESS_QUERY_INFORMATION,FALSE, ProcessID);
-					if (hProcess != NULL)
-					{
-						if (procs.find(ProcessID) == procs.end()) //TODO  not elevated  PHack is using PROCESS_QUERY_LIMITED_INFORMATION,
-						{
-							unique_lock<mutex> lock(start_mtx);
-							start_queue.push(ProcessID);
-							cv_start.notify_one();
-							procs.insert(ProcessID);
-						}
-						CloseHandle(hProcess);
-					}
+					Processes.insert(startqi.ID);
 
+					if (process_map.find(startqi.ID) == process_map.end())//if not already got this one - log
+					{
+						unique_lock<mutex> lock(start_mtx);
+						qi tqi;
+						tqi.ID = startqi.ID;
+						tqi.parentID = startqi.parentID;
+						tqi.st = startqi.st;
+						start_queue.push(tqi);
+						cv_start.notify_one();
+					}
 				}
-				ProcessID = ProcessHackerGetNextProcess();
-			} while (ProcessID > -1);
+				ProcessHackerGetNextProcess(&startqi);
+			} while (startqi.ID );
 
 			//result present in first but not second
-			set<long> result;
+			set<HANDLE> result;
 			set_difference(OldProcesses.begin(), OldProcesses.end(), Processes.begin(), Processes.end(), inserter(result, result.end()));
 
 
-			set<long>::iterator it;
+			set<HANDLE>::iterator it;
 			for (it = result.begin(); it != result.end(); it++)
 			{
-				if(procs.find(*it)!=procs.end())
-					procs.erase(*it);
 				unique_lock<mutex> lock(stop_mtx);
 				stop_queue.push(*it);
 				cv_stop.notify_one();
@@ -121,7 +115,7 @@ ptime rb = microsec_clock::local_time();
 ProcessHackerCleanUp();
 ptime re = microsec_clock::local_time();
 		time_duration rtd= re - rb;
-		::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" refresh#"+ boost::lexical_cast<string>(procs.size())+"pm# "+ boost::lexical_cast<string>(process_map.size())).c_str());
+		::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" pm# "+ boost::lexical_cast<string>(process_map.size())).c_str());
 	}
 		/* Do not forget to clean up the snapshot object. */
 
