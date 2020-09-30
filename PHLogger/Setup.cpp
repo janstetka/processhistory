@@ -1,16 +1,11 @@
 #include "PHLogger.h"
 #include "PHLogUser.h"
 #include "..\phshared\phshared.h"
-
-#if defined (_WIN64)
 #include <thread>
-#else
-#include "boost\thread\thread.hpp"
-using namespace boost;
-#endif
+
 using namespace std;
 
-map<string,long> PHPaths;
+map<string, sqlite3_int64> PHPaths;
 
 //void LoadPathData();
 
@@ -37,11 +32,11 @@ void LoadPathData(CProgressBarCtrl m_sBar)
 	while( sqlite3_step(stmt) == SQLITE_ROW )
 	{
 		const unsigned char* Path=sqlite3_column_text(stmt,0);
-		long ID=sqlite3_column_int(stmt,1);
+		sqlite3_int64 ID=sqlite3_column_int(stmt,1);
 		string p=(char*)Path;
 		
 		//boost::mutex::scoped_lock psl(paths_mtx);
-		PHPaths.insert(pair<string,long>(p,ID));
+		PHPaths.insert(pair<string, sqlite3_int64>(p,ID));
 		m_sBar.SetPos((int)ID);
 	}	
 	m_sBar.SetPos(0);

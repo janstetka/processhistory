@@ -6,14 +6,10 @@
 #include "boost/date_time/local_time_adjustor.hpp"
 #include "boost/date_time/c_local_time_adjustor.hpp"
 #include <set>
-#if defined (_WIN64)
 #include <mutex>
-#else
-#include "boost\thread\mutex.hpp"
-using namespace boost;
-#endif
 #include <queue>
 #include <..\PHQuery\ph.h>
+#include "..\background\phacker.h"
 
 using namespace std;
 using namespace boost::posix_time;
@@ -22,36 +18,38 @@ using namespace boost::date_time;
 /*fine grain threading*/
 
 extern CPHLogger logger;
-map<long,CProcessInfo> process_map;
+map<HANDLE,CProcessInfo> process_map;
 
 mutex db_mutex;
 extern mutex start_mtx, stop_mtx;
 extern condition_variable cv_start, cv_stop;
-extern queue<long> start_queue, stop_queue;
+
+extern queue<qi> start_queue;
+extern queue<HANDLE> stop_queue;
 extern PH ph_instance;
 void StartEvent()
 {
 	while (logger._Refresh > -1) {
-		long PID;
+		qi P;
 		{
 		unique_lock<mutex> lk(start_mtx);
 		while (start_queue.empty())
 			cv_start.wait(lk);
 		if (start_queue.empty())
 			continue;
-		if (start_queue.size() > 1)
-			::SetWindowText(ph_instance._hWndStatusBar, ("STARTQ "+boost::lexical_cast<string>(start_queue.size())).c_str()); 
-		PID = start_queue.front();
-		::SetWindowText(ph_instance._hWndStatusBar, ("START PID " + boost::lexical_cast<string>(PID)).c_str());
+		//if (start_queue.size() > 1)
+		//	::SetWindowText(ph_instance._hWndStatusBar, ("STARTQ "+boost::lexical_cast<string>(start_queue.size())).c_str()); 
+		P = start_queue.front();
+		//::SetWindowText(ph_instance._hWndStatusBar, ("START PID " + boost::lexical_cast<string>(PID)).c_str());
 		start_queue.pop();
 	}
-		logger.StartEvent(PID);
+		logger.StartEvent(P);
 	}
 }
 void StopEvent()
 {
 	while (logger._Refresh > -1) {
-		long PID;
+		HANDLE PID;
 		{
 			unique_lock<mutex> lk(stop_mtx);
 			while (stop_queue.empty())
@@ -68,42 +66,40 @@ void StopEvent()
 }
 
 /*Process Start*/
-void CPHLogger ::StartEvent( long lPId)
+void CPHLogger ::StartEvent( qi P)
 {
 	
 	//PHMessage("Start: "+lexical_cast<string>(lPId));
 
 	CProcessInfo clStart;
 	//string Path;
-	clStart= CProcessInfo(lPId);	
+	clStart= CProcessInfo(P.ID,P.st);//lPId);	
+	clStart.ParentPID=P.parentID;
 
 	/*May have died already*/
-	if (clStart.Validate() == false)
-		return;
-
-	clStart.GetExecutableImage();
 	
 	/*Has enough data been gathered - missing executable ok, will gather on refresh*/
 	if(clStart.Validate()==false)
 		return ;
 
-	clStart.ConvertStartTime();
+	//clStart.ConvertStartTime();
 
-	HANDLE hProcess=OpenProcess(PROCESS_QUERY_INFORMATION ,FALSE,lPId);
+	HANDLE hProcess = NULL;
+		PHackerOpenProcess(P.ID,PROCESS_QUERY_LIMITED_INFORMATION,&hProcess );
 
 	
 	PHProcessData phpd;
 	phpd.hP=hProcess;
 	phpd.time=clStart.GetStart();
 
-	process_map.insert(pair<long,CProcessInfo>(lPId,clStart));//CONSTRUCTOR - may be better to not store cprocessinfo in map
+	process_map.insert(pair<HANDLE,CProcessInfo>(P.ID,clStart));//CONSTRUCTOR - may be better to not store cprocessinfo in map
 
 	phpd.ProcessID=clStart._ProcessID;
 
 	{
 	//mutex::scoped_lock log_scoped_lock(logger.processes_mutex);
 	/*This needs to be put in the map whether or not the process is in the data*/
-	g_clProcesses.insert(pair<long,PHProcessData>(lPId,phpd));
+	g_clProcesses.insert(pair<HANDLE,PHProcessData>(P.ID,phpd));
 	}
 }
 
@@ -113,20 +109,24 @@ public:
 	DeadProcess(){}
 	bool ExitTime(HANDLE h)
 	{
-		FILETIME ftCreation,ftExit,ftKernel,ftUser;
+		/*FILETIME ftCreation,ftExit,ftKernel,ftUser;
 		BOOL bRet = GetProcessTimes(h,&ftCreation,&ftExit,&ftKernel,&ftUser);
 		if(bRet!=TRUE)
 		{
 			PHTrace("GetProcessTimes on open dead process handle failed"+string(Win32Error()),__LINE__,__FILE__);
 			CloseHandle(h);
 			return false;
-		}
-		
+		}*/
+		SYSTEMTIME  ftExit;// , ftKernel, ftUser;
+/*Retreive the process start time*/
+		ftExit = PHackerGetProcessTimesE(h);//try using handle passed through from refresh rather than opening a new one
 		/*Win32 end*/
 		try
-		{
-			_Exit= from_ftime<ptime>(ftExit);
-			_Exit=c_local_adjustor<ptime>::utc_to_local(_Exit);
+		{//ELEV - can't get a process end time on another users process unelevated?https://sourceforge.net/p/processhistory/code/25/tree/trunk/PHLogger/
+			//_Exit= from_ftime<ptime>(ftExit);
+			//_Exit=c_local_adjustor<ptime>::utc_to_local(_Exit);
+			_Exit = ptime(boost::gregorian::date(ftExit.wYear, ftExit.wMonth, ftExit.wDay), hours(ftExit.wHour) + minutes(ftExit.wMinute) + seconds(ftExit.wSecond) + milliseconds(ftExit.wMilliseconds));
+			// TODO 2020 can anything else be done here - path etc to save time in constructor
 		}
 		catch(...)
 		{
@@ -140,16 +140,16 @@ public:
 	}
 
 	ptime _Exit;
-	int _pid;
-	long _dbid;
+	HANDLE _pid;
+	sqlite3_int64 _dbid;
 };
 
 /*Process end*/
-void CPHLogger ::StopEvent(long lPID)
+void CPHLogger ::StopEvent(HANDLE lPID)
 {	
 	//PHMessage("End: "+lexical_cast<string>(lPID));
 	
-	map<long,PHProcessData>::iterator llit;
+	map<HANDLE,PHProcessData>::iterator llit;
 	{
 		//mutex::scoped_lock log_scoped_lock(logger.processes_mutex);
 		llit=g_clProcesses.find(lPID);
@@ -187,10 +187,10 @@ void CPHLogger ::StopEvent(long lPID)
 	it will have been saved when PH started (See above)*/
 	
 		//dp.WriteEnd(Creation);	writing everything on process end
-		map<long,CProcessInfo>::iterator pi=process_map.find(lPID);
+		map<HANDLE,CProcessInfo>::iterator pi=process_map.find(lPID);
 		if(pi!=process_map.end())
 		{
-			pi->second.SaveProcess(dp._Exit);
+			pi->second.SaveProcess(dp._Exit,false);
 		}
 		process_map.erase(lPID);
 }

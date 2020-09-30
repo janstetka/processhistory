@@ -7,18 +7,18 @@
 using namespace std;
 //using namespace boost;
 
-map<string,long> g_clUser;
+map<string, sqlite3_int64> g_clUser;
 //extern mutex db_mutex;
 //mutex user_mtx;
 
 /*Get the database ID of a windows user*/
-long GetUserID(string clUserName)
+sqlite3_int64 GetUserID(string clUserName)
 {
 	//mutex::scoped_lock sl(user_mtx);
-	map<string,long>::iterator it;
+	map<string, sqlite3_int64>::iterator it;
 	it=g_clUser.find(clUserName);
 	if (it == g_clUser.end())
-		 CreateUser(clUserName);
+		 return CreateUser(clUserName);
 	else
 		return it->second;
 }
@@ -31,7 +31,7 @@ bool ReadUserTable()
 	sqlite3_stmt* stmt;
 
 	char *clSQL="SELECT ID,UserName FROM PHLogUser;";
-	long lUserID=-1;
+	sqlite3_int64 lUserID=-1;
 
 	sqlite3 * db=OpenDB();
 	if(SQLITE_OK!=sqlite3_prepare(db,clSQL,-1,&stmt,NULL))
@@ -48,7 +48,7 @@ bool ReadUserTable()
 		{
 			
 			User=(char *)szuser;
-			g_clUser.insert(pair<string,long>(User,lUserID));
+			g_clUser.insert(pair<string, sqlite3_int64>(User,lUserID));
 			//cout<< "loaded user: "<<User<< endl;
 		}
 	}
@@ -62,11 +62,11 @@ bool ReadUserTable()
 	return true;
 }
 
-long CreateUser(string User)
+sqlite3_int64 CreateUser(string User)
 {
 	//mutex::scoped_lock lock(db_mutex);
 	//mutex::scoped_lock sl(user_mtx);
-	long lUserID;
+	sqlite3_int64 lUserID;
 	string clSQL;
 
 	
@@ -80,7 +80,7 @@ long CreateUser(string User)
 		DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
 
 	lUserID=sqlite3_last_insert_rowid(db);
-	g_clUser.insert(pair<string,long>(User,lUserID));
+	g_clUser.insert(pair<string, sqlite3_int64>(User,lUserID));
 	sqlite3_close(db);
 
 	return lUserID;

@@ -1,3 +1,3 @@
-long GetUserID(std::string clUserName);
+sqlite3_int64 GetUserID(std::string clUserName);
 bool ReadUserTable();
-long CreateUser(std::string User);
+sqlite3_int64 CreateUser(std::string User);

@@ -11,8 +11,15 @@ struct PHProcessData
 {
 	boost::posix_time::ptime time;
 	//
-	long ProcessID;
+	sqlite3_int64 ProcessID;
 	HANDLE hP;
+};
+
+struct qi
+{
+HANDLE ID;
+SYSTEMTIME st;
+HANDLE parentID;
 };
 
 /*Only one instance of this class is allowed, singleton*/
@@ -27,12 +34,12 @@ public:
 		
 
 	void StartProcessHistory();
-	void StartEvent( long lPId);
-	void StopEvent(long lPID);
+	void StartEvent( qi P);
+	void StopEvent(HANDLE lPID);
 
 	/*The processes that are being logged*/
 
-	std::map<long,PHProcessData> g_clProcesses;
+	std::map<HANDLE,PHProcessData> g_clProcesses;
 
 	//boost::mutex processes_mutex;
 	
@@ -44,7 +51,7 @@ public:
 
 void CreateTables();
 void StartEv(long p);
-long GetPathID(std::string path);
+sqlite3_int64 GetPathID(std::string path);
 void StartBackground();
 void StopBackground();
 void PHMessage(std::string);
