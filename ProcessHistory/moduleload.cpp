@@ -1,27 +1,21 @@
 #include "..\phshared\phshared.h"
-#if defined (_WIN64)
 #include <mutex>
-#else
-#include "boost\thread\mutex.hpp"
-#include <boost\thread\lock_guard.hpp> 
-using namespace boost;
-#endif
 #include "boost/algorithm/string.hpp"
 #include "..\phlogger\phlogger.h"
 
 using namespace std;
 using namespace boost::algorithm;
 
-extern map<string,long> PHPaths;
+extern map<string, sqlite3_int64> PHPaths;
 //boost::mutex paths_mtx,cl_mtx;
 extern mutex db_mutex;
 
-long GetPathID(string path)
+sqlite3_int64 GetPathID(string path)
 {
 	//boost::mutex::scoped_lock psl(paths_mtx);	
 	to_lower(path);
-	map<string,long>::iterator path_it=PHPaths.find(path);
-	long PathID=-1;
+	map<string, sqlite3_int64>::iterator path_it=PHPaths.find(path);
+	sqlite3_int64 PathID=-1;
 
 	if(path_it==PHPaths.end())
 	{	
@@ -47,7 +41,7 @@ long GetPathID(string path)
 		sqlite3_close(db);
 
 		
-		PHPaths.insert(pair<string,long>(path,PathID));
+		PHPaths.insert(pair<string, sqlite3_int64>(path,PathID));
 
 	}
 	else
@@ -57,15 +51,15 @@ long GetPathID(string path)
 	return PathID;
 }
 
-map<string,long> PHCLs;
+map<string, sqlite3_int64> PHCLs;
 
-long getclid(string cl)
+sqlite3_int64 getclid(string cl)
 {
 	
 	//boost::mutex::scoped_lock psl(cl_mtx);
 	to_lower(cl);
-	map<string,long>::iterator path_it=PHCLs.find(cl);
-	long PathID=-1;
+	map<string, sqlite3_int64>::iterator path_it=PHCLs.find(cl);
+	sqlite3_int64 PathID=-1;
 
 	if (path_it == PHCLs.end())// if not in memory check disk
 	{
@@ -76,8 +70,8 @@ long getclid(string cl)
 			DBError(sqlite3_errmsg(db), __LINE__, __FILE__);//TODO whats the select equivalent of %Q
 		if (sqlite3_step(stmt) == SQLITE_ROW)
 		{
-			long ID = sqlite3_column_int(stmt, 1);
-			PHCLs.insert(pair<string, long>(cl, ID));
+			sqlite3_int64 ID = sqlite3_column_int(stmt, 1);
+			PHCLs.insert(pair<string, sqlite3_int64>(cl, ID));
 		}
 		else//if not on disk persist
 		{
@@ -99,7 +93,7 @@ long getclid(string cl)
 			if (PathID < 1)
 				PHTrace("Invalid Command Line ID", __LINE__, __FILE__);
 
-			PHCLs.insert(pair<string, long>(cl, PathID));
+			PHCLs.insert(pair<string, sqlite3_int64>(cl, PathID));
 		}
 	}
 	else
@@ -108,7 +102,7 @@ long getclid(string cl)
 	return PathID;
 }
 
-#include "..\ProcessHistory\Progress.h"
+
 
 /*void LoadCommandLines(CProgressBarCtrl m_sBar)
 {

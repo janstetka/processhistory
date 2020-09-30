@@ -88,6 +88,7 @@ public:
 		COMMAND_HANDLER(ID_EXEC_FILTER_COMBO, CBN_SELCHANGE, OnComboChange)
 		COMMAND_HANDLER(ID_USERFILTER_COMBO, CBN_SELCHANGE, OnComboChange)
 		MESSAGE_HANDLER(BXT_WM_ENTER, OnCommandEnter)
+		COMMAND_ID_HANDLER(ID_PH_SETTINGS, OnSettings)
 		CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
 		CHAIN_MSG_MAP(CToolBarHelper<CMainFrame>)
 	END_MSG_MAP()
@@ -139,6 +140,7 @@ public:
 	LRESULT OnStatusBarDblClick(int /*wParam*/, LPNMHDR lParam, BOOL& bHandled);
 	LRESULT OnComboChange(WORD /*wNotifyCode*/, WORD wID, HWND hWndCtl, BOOL& /*bHandled*/);
 	LRESULT OnCommandEnter(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnSettings(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	void ParseQry();// char * lbtext = NULL);
 	void DateTimeQry();
@@ -161,3 +163,5 @@ public:
 		return 0;
 	}	
 };
+
+#include "SettingsDlg.h"

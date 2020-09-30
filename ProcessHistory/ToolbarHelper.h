@@ -297,7 +297,7 @@ public:
 		CString strItemText;
 		combo.GetLBText(nSel, strItemText);
 		// Get the item data
-		DWORD dwItemData = combo.GetItemData(nSel);
+		DWORD_PTR dwItemData = combo.GetItemData(nSel);
 		// Call special function to handle the selection change
 		pT->OnToolBarCombo(combo, wID, nSel, strItemText, dwItemData);
 		// Set focus to the main window

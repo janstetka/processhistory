@@ -131,6 +131,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalIncludeDirectories>d:\wtl\include\;D:\boost_1_73_0;..\background\nowide_standalone\;D:\processhacker-master\phlib\include;D:\processhacker-master\phnt\include;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)ProcessHistory.exe</OutputFile>
@@ -224,6 +225,7 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="PHScroll.h" />
     <ClInclude Include="Progress.h" />
+    <ClInclude Include="SettingsDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\big files\src\phquery\mainfram.bmp" />

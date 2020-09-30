@@ -1,16 +1,10 @@
 #include "..\PHQuery\query.h"
 #include "..\phshared\phshared.h"
 #include "..\PHQuery\screen.h"
-#include "..\PHQuery\resource.h"
+//#include "..\PHQuery\resource.h"
 #include "PHScroll.h"
 #include <boost/filesystem.hpp>
-#if defined (_WIN64)
 #include <mutex>
-#else
-#include "boost\thread\mutex.hpp"
-#include <boost\thread\lock_guard.hpp> 
-using namespace boost;
-#endif
 
 using namespace boost::posix_time;
 using namespace std;
@@ -66,8 +60,8 @@ void PHTimeInfo::CalculateRect()
 		r.right = 1600;
 		r.top = 0;
 		r.bottom = 900;
-		if (_MemDC->DrawText(_ps.c_str(), _ps.length(), &r, DT_CALCRECT) == 0)
-			PHTrace(Win32Error(), __LINE__, __FILE__);
+		_MemDC->DrawText(_ps.c_str(),static_cast<int>( _ps.length()), &r, DT_CALCRECT);
+			//PHTrace(Win32Error(), __LINE__, __FILE__);
 		r.bottom += 5;
 		r.right += 50;
 
@@ -111,8 +105,8 @@ void PHTimeInfo::DrawMemDC()
 			r.right = _Width;
 		r.bottom = _Height;
 
-		if (_MemDC->DrawText(_ps.c_str(), _ps.length(), &r, DT_LEFT | DT_VCENTER) == 0)
-			PHTrace(Win32Error(),__LINE__,__FILE__);		
+		_MemDC->DrawText(_ps.c_str(), static_cast<int>(_ps.length()), &r, DT_LEFT | DT_VCENTER);
+			//PHTrace(Win32Error(),__LINE__,__FILE__);		
 	
 	_MemDC->SelectFont(oldFont);
 		hFont.DeleteObject();
@@ -143,8 +137,8 @@ void PHTimeScale::CalcTimeScale()
 	r.right = 1600;
 	r.top = 0;
 	r.bottom = 900;
-	if (_MemDC->DrawText(TimeText.c_str(), TimeText.length(), &r, DT_CALCRECT) == 0)
-		PHTrace(Win32Error(), __LINE__, __FILE__);
+	_MemDC->DrawText(TimeText.c_str(), static_cast<int>(TimeText.length()), &r, DT_CALCRECT);
+		//PHTrace(Win32Error(), __LINE__, __FILE__);
 	_HeightTimeLine = r.bottom+10;
 	_MemDC->SelectFont(oldFont);
 	hFont.DeleteObject();
@@ -177,9 +171,9 @@ void PHTimeScale::DrawTimeAxis()
 	CFont oldFont = _MemDC->SelectFont(hFont);
 
 	time_duration wld=phd._WinLeft.time_of_day();
-	int wls=wld.seconds();
+	int64_t wls=wld.seconds();
 	int i=0;
-	i+=(60-wls);
+	i+=(60- static_cast<int>(wls));
 	/* draw markers and times*/
 	//if()//if screen width is less than a minute, mark seconds, greater than a minute mark minutes
 	time_iterator titr(phd._WinLeft+seconds(i),minutes(1)); 
@@ -200,15 +194,15 @@ void PHTimeScale::DrawTimeAxis()
 		r.right = 1600;
 		r.top = 0;
 		r.bottom = 900;
-		if (_MemDC->DrawText(TimeText.c_str(), TimeText.length(), &r, DT_CALCRECT) == 0)
-				PHTrace(Win32Error(), __LINE__, __FILE__);
+		_MemDC->DrawText(TimeText.c_str(), static_cast<int>(TimeText.length()), &r, DT_CALCRECT);
+				//PHTrace(Win32Error(), __LINE__, __FILE__);
 		r.left = i - 15;
 		r.top = 10;
 		r.bottom += 10;
 		r.right += (i - 15);
 
-		if (_MemDC->DrawText(TimeText.c_str(), TimeText.length(), &r, DT_LEFT | DT_VCENTER) == 0)
-			PHTrace(Win32Error(), __LINE__, __FILE__);
+		_MemDC->DrawText(TimeText.c_str(), static_cast<int>(TimeText.length()), &r, DT_LEFT | DT_VCENTER);
+			//PHTrace(Win32Error(), __LINE__, __FILE__);
 		
 		i+=60;
 	}	
@@ -227,7 +221,7 @@ void PHTimeInfo::DisplayInfo()
 	string bintxt,total_duration;
 	PHProcess pclProcess;
 	time_duration ProcessDuration;
-	//unsigned long CRC;
+
 	 if (phd._mouseover>0)
 		_ID=phd._mouseover;
 	
@@ -272,7 +266,6 @@ void PHTimeInfo::DisplayInfo()
 		{
 			user=sqlite3_column_text(stmt2,0);
 			usertxt=(char*)user;
-			//CRC=sqlite3_column_int(stmt2,1);
 		}
 		sqlite3_finalize(stmt2);
 		
@@ -327,7 +320,7 @@ void PHTimeInfo::DisplayInfo()
 	<<"User: "<<usertxt;
 
 	dlgos << "\r\n" << "Path: " << pathtxt << "\r\n" << "Command line: " << cltxt << "\r\n" << Product << " " << Description
-		<< "\r\n" << bintxt << "\r\n";// << "CRC: " << CRC;
+		<< "\r\n" << bintxt << "\r\n";
 
 
 		_ps = dlgos.str();

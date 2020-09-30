@@ -66,9 +66,6 @@
     <ClCompile Include="..\phshared\phshared.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\PHLogger\DBTables.cpp">
-      <Filter>Source Files\background</Filter>
-    </ClCompile>
     <ClCompile Include="..\PHLogger\log.cpp">
       <Filter>Source Files\background</Filter>
     </ClCompile>
@@ -92,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="..\sqlite\sqlite3.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PHLogger\DBTables.cpp">
+      <Filter>Source Files\background</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +120,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Progress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
