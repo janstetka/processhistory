@@ -7,77 +7,19 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-//#include <tlhelp32.h>
-//#include "Crc32Static.h"
 
 using namespace boost::posix_time;
 using namespace std;
-//using namespace boost;
-// a mutex here may actually increase performance
-//reads may be sequential, process shared
-//mutex crc_mutex;
-
-/*unsigned long GetFileCRC(string file)
-{
-	DWORD dwCRC=0;
-	CCrc32Static::FileCrc32Assembly(file.c_str(),dwCRC);
-	
-	return dwCRC;
-}*/
-
-
-/*Win32 Start*/
-
-
-/*void GetExecutableName(long lPID, string & ExecPath)
-{
-	EnablePrivilege(SE_DEBUG_NAME);
-		HANDLE        hModuleSnap = NULL; 
-		MODULEENTRY32 me32        = {0}; 
-		ExecPath="";
-
-		// Take a snapshot of all modules in the specified process. 
-		
-			hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE| TH32CS_SNAPMODULE32, lPID); //64bit
-			DWORD dwError=GetLastError();
-			if (hModuleSnap == INVALID_HANDLE_VALUE) 
-			{					
-				if(dwError==ERROR_ACCESS_DENIED)
-					return ;
-				if(dwError==ERROR_INVALID_PARAMETER)
-					return;
-			}
-			
-			// Fill the size of the structure before using it. 
-
-			me32.dwSize = sizeof(MODULEENTRY32); 
-		 
-			// Walk the module list of the process, and find the module of 
-			// interest. Then copy the information to the buffer pointed 
-			// to by lpMe32 so that it can be returned to the caller. 
-
-			if (Module32First(hModuleSnap, &me32)) 
-			{ 
-				CloseHandle (hModuleSnap);
-				ExecPath=me32.szExePath;
-				return ;				 	
-			}
-			//ERROR_NO_MORE_FILES
-			
-			CloseHandle (hModuleSnap);
-		return ; 
-}
-Win32 End*/
 
 void GetModulePath(string & Folder)
 {
-	int iSt;
+	size_t iSt;
 	string ExecImagePath	;
 	TCHAR szFileName[MAX_PATH];
 	GetModuleFileName(NULL,szFileName,MAX_PATH);
 	ExecImagePath = szFileName;
 	iSt=ExecImagePath.find_last_of('\\');
-	Folder=ExecImagePath.substr(0,iSt+1);
+	Folder=ExecImagePath.substr(0,iSt+(size_t)1);
 }
 
 // create ph.db in this module's directory
@@ -128,7 +70,7 @@ char *sysMsg;
 	return ret;
 }
 // Useful helper function for enabling a single privilege
-BOOL EnableTokenPrivilege(HANDLE htok, LPCTSTR szPrivilege, TOKEN_PRIVILEGES& tpOld)
+/*BOOL EnableTokenPrivilege(HANDLE htok, LPCTSTR szPrivilege, TOKEN_PRIVILEGES& tpOld)
 {
    TOKEN_PRIVILEGES tp;
    tp.PrivilegeCount = 1;
@@ -171,10 +113,10 @@ BOOL EnablePrivilege(LPCTSTR szPrivilege)
 }
 
 void GetProcessUser(HANDLE hProcess,string & pu)
-{
-	EnablePrivilege(SE_TCB_NAME);
+{*/
+	//EnablePrivilege(SE_TCB_NAME);
 	/*Determine the user*/
-	HANDLE hToken;
+	/*HANDLE hToken;
 	if(0!=OpenProcessToken(hProcess,TOKEN_QUERY,&hToken))
 	{
 		PTOKEN_USER   ptiUser        = NULL;
@@ -219,7 +161,8 @@ void GetProcessUser(HANDLE hProcess,string & pu)
 		}
 		CloseHandle(hToken); 
 	}	
-}/*Win32 End*/
+	
+}*//*Win32 End*/
 
 std::string BoostToSQLite(boost::posix_time::ptime p)
 {
