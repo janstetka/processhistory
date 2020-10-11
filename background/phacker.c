@@ -196,7 +196,7 @@ VOID PhpEnablePrivileges(
         NtClose(tokenHandle);
     }
 }
-BOOLEAN PHackerGetVersionInfo(PWSTR FileNameWin32, PWSTR *Product, PWSTR *Description, SIZE_T *ProductLength, SIZE_T *DescriptionLength)
+BOOLEAN PHackerGetVersionInfo(PWSTR FileNameWin32, PWSTR *Product, PWSTR *Description, SIZE_T *ProductLength, SIZE_T *DescriptionLength)//TODO 2020: make this more like calling a phacker function i.e. pass a reference to a structure
 {
     PH_IMAGE_VERSION_INFO VersionInfo;// = 0;
     // Version info.

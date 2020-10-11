@@ -4,8 +4,9 @@
 #include <string>
 #include "..\phshared\phshared.h"
 //#include "..\background\phacker.h"
+#include "boost/format.hpp"
 
-std::string ProcessHackerVer;
+std::string ProcessHackerVer;//TODO
 
 class AboutCtrl : public CDialogImpl<AboutCtrl>
 {
@@ -41,10 +42,10 @@ public:
 	GetNativeSystemInfo(&si);*/
 
 	std::ostringstream os;
-	os << "SQLite : ";
+	/*os << "SQLite : ";
 	os << SQLITE_VERSION << "\n"
 		<< "Windows Template Library : " << std::hex << _WTL_VER << "\n";
-	os << "Boost C++ (datetime,filesystem) : " << BOOST_LIB_VERSION << "\n"  << ProcessHackerVer << "\n";
+	os << "Boost C++ (datetime,filesystem) : " << BOOST_LIB_VERSION << "\n"  << ProcessHackerVer << "\n";*/
 	/*if(osvi.dwMajorVersion==5 && osvi.dwMinorVersion==1)
 	{
 		os<<"Windows XP";
@@ -58,18 +59,18 @@ public:
 	/*	if(si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
 			os<<" 64 bit CPU";
 	}*/
-		os<< "Built : " << __DATE__<<" "<<__TIME__;
+		/*os<< "Built : " << __DATE__<<" "<<__TIME__;
 		os << "\nMicrosoft Visual C++ : " <<std::dec<< _MSC_VER;
 #if defined(_WIN64)
 		os<<" 64bit ";
 #else
 		os<<" 32bit";
-		#endif
+		#endif*/
 		std::string file;
 	GetModulePath(file);
 	file.append("PHTrace.txt");
 	os<<"\nError logging to: "<<file;
-	
+	os<< boost::format("SQLite : %s\nWindows Template Library : %h\nBoost C++ (datetime) : %s\nBuilt : %s\nMicrosoft Visual C++ : %d\nError logging to: %s") % SQLITE_VERSION % _WTL_VER % BOOST_LIB_VERSION % (std::string(__DATE__) + " " +std::string( __TIME__)) % _MSC_VER % file;
 	SetDlgItemText(IDC_ABOUT_TEXT,os.str().c_str());
 		return TRUE;
 	}

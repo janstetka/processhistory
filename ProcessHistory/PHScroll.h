@@ -18,14 +18,14 @@ public:
 		MESSAGE_HANDLER(WM_RBUTTONDOWN, OnRB)
 		MESSAGE_HANDLER(WM_LBUTTONDOWN, OnLB)
 		 MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
-		 MESSAGE_HANDLER(WM_MOUSEMOVE,OnMouseMove)
+		// MESSAGE_HANDLER(WM_MOUSEMOVE,OnMouseMove)
 		 CHAIN_MSG_MAP(CScrollWindowImpl<PHScroll>);
 	END_MSG_MAP()
 
 	void DoPaint(CDCHandle hDC);
 	
 	LRESULT OnRB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
-	LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
+	//LRESULT OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/);
 	LRESULT OnLB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	void SetSize(SIZE);

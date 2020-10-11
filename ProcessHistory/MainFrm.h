@@ -165,3 +165,4 @@ public:
 };
 
 #include "SettingsDlg.h"
+

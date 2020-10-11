@@ -132,6 +132,7 @@
       <AdditionalIncludeDirectories>d:\wtl\include\;D:\boost_1_73_0;..\background\nowide_standalone\;D:\processhacker-master\phlib\include;D:\processhacker-master\phnt\include;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)ProcessHistory.exe</OutputFile>
@@ -222,6 +223,7 @@
     <ClInclude Include="..\PHQuery\Query.h" />
     <ClInclude Include="..\PHQuery\resource.h" />
     <ClInclude Include="..\PHQuery\screen.h" />
+    <ClInclude Include="Drilldown.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="PHScroll.h" />
     <ClInclude Include="Progress.h" />

@@ -172,17 +172,17 @@ _MemDC->SetTextColor(old_txt);
 	hFont.DeleteObject();
 	}/*end process*/
 
-#include <boost/filesystem.hpp>
-#if defined (_WIN64)
+#include <filesystem>
+//#if defined (_WIN64)
 #include <mutex>
-#else
+/*#else
 #include "boost\thread\mutex.hpp"
 #include <boost\thread\lock_guard.hpp> 
 	using namespace boost;
-#endif
+#endif*/
 
 extern mutex db_mutex;
-using namespace boost::filesystem;
+//using namespace boost::filesystem;
 
 void PHDisplay::ReadPaths()// base on paths.id avoids duplication 
 {
@@ -197,12 +197,8 @@ void PHDisplay::ReadPaths()// base on paths.id avoids duplication
 		sqlite3_stmt* stmt;
 		
 		long lID=it->first;
-		ostringstream os;
-		os<<
-		"SELECT Paths.Directory,Paths.ID FROM Process JOIN Paths ON Process.PathID=Paths.ID WHERE Process.ID=";
-		os<<lID;
-		os<<";";
-		if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
+		string os="SELECT Paths.Directory,Paths.ID FROM Process JOIN Paths ON Process.PathID=Paths.ID WHERE Process.ID="+to_string(lID)+";";
+		if(sqlite3_prepare(db,os.c_str(),-1,&stmt,NULL)!=SQLITE_OK)
 			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
 			
 		if(sqlite3_step(stmt)== SQLITE_ROW )
@@ -214,7 +210,7 @@ void PHDisplay::ReadPaths()// base on paths.id avoids duplication
 
 			long PathID= sqlite3_column_int(stmt,1);
 			phq._PData.insert(pair<long,long>(lID,PathID));
-			if ( exists(FileName))
+			if ( filesystem::exists(FileName))
 			{
 			map<long,HICON>::iterator icon_it= icons.find(PathID);
 			if(icon_it==icons.end())

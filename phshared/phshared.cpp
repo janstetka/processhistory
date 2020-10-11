@@ -191,7 +191,7 @@ void PHTrace(string err,int line,string errfile)//TODO: only create once or leav
 	ofstream out(file.c_str(),ios::ate|ios::app);
 	out.seekp(0, ios::end);
 	ptime p = second_clock::local_time();
-	out<<to_simple_string(p)<<" "<< boost::lexical_cast<string>(line) <<" "<< errfile <<" "<< err<< endl;
+	out<<to_simple_string(p)<<" "<< to_string(line) <<" "<< errfile <<" "<< err<< endl;
 }
 
 

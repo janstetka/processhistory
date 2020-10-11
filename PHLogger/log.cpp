@@ -1,11 +1,6 @@
 #include "PHLogger.h"
 #include "ProcessInfo.h"
-#include <sstream>
 #include "boost/date_time/posix_time/posix_time.hpp"
-#include "..\phshared\phshared.h"
-#include "boost/date_time/local_time_adjustor.hpp"
-#include "boost/date_time/c_local_time_adjustor.hpp"
-#include <set>
 #include <mutex>
 #include <queue>
 #include <..\PHQuery\ph.h>
@@ -56,8 +51,8 @@ void StopEvent()
 				cv_stop.wait(lk);
 			if (stop_queue.empty())
 				continue;
-			if (stop_queue.size() > 1)
-				::SetWindowText(ph_instance._hWndStatusBar, ("STOPQ "+boost::lexical_cast<string>(stop_queue.size())).c_str());
+			/*if (stop_queue.size() > 1)
+				::SetWindowText(ph_instance._hWndStatusBar, ("STOPQ "+boost::lexical_cast<string>(stop_queue.size())).c_str());*/
 			PID = stop_queue.front();
 			stop_queue.pop();
 		}
@@ -126,7 +121,13 @@ public:
 			//_Exit= from_ftime<ptime>(ftExit);
 			//_Exit=c_local_adjustor<ptime>::utc_to_local(_Exit);
 			_Exit = ptime(boost::gregorian::date(ftExit.wYear, ftExit.wMonth, ftExit.wDay), hours(ftExit.wHour) + minutes(ftExit.wMinute) + seconds(ftExit.wSecond) + milliseconds(ftExit.wMilliseconds));
-			// TODO 2020 can anything else be done here - path etc to save time in constructor
+			// TODO 2020 can anything else be done here - path etc to save time in constructor - most info has to be gathered immediately incase process ends
+			// todo 2020 review use of stringstream - boost format or std::format in C++20
+			// seperate bits of code such as drill down that aren't core / use a bottom pane for list of events in that time period(go back to details dialog) -  recording parent process start (if not already dead) 
+			// owner drawn list?
+			// review use of boost - has anything else used become standard? lexical cast, filesystem etc.
+			// anything else modern c++ e.g. iterators now range - only in bits of code that are core
+			// don't do mouseover
 		}
 		catch(...)
 		{

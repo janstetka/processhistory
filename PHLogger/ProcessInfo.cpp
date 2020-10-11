@@ -4,20 +4,16 @@
 #include <string>
 #include <sstream>
 #include "..\phshared\phshared.h"
-#include "boost/date_time/local_time_adjustor.hpp"
-#include "boost/date_time/c_local_time_adjustor.hpp"
-#include "boost/algorithm/string.hpp"
-//#include <set>
+#include "boost/format.hpp"
 #include "..\background\phacker.h"
 #include "nowide\convert.hpp"
 #include <mutex>
-
 
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace std;
 using namespace boost::date_time;
-using namespace boost::algorithm;
+
 
 extern CPHLogger logger;
 //extern map<string,long> PHPaths;
@@ -150,15 +146,18 @@ extern map<HANDLE, CProcessInfo> process_map;
 }
 /*Log the process starting*/
  void CProcessInfo::SaveProcess(ptime ExitTime, bool parent)
- {
-	 ostringstream clSQL;
-	 clSQL.str("");
-
+ {	 
 	 sqlite3_int64 PathID = GetPathID(_path);
 	 if (PathID == -1)
 		 return;
+	 ostringstream clSQL;
+	 clSQL.str("");
+	 clSQL << boost::format("INSERT INTO Process(CreationTime,PathID,CLID,UserID,Destruction,ParentID VALUES (JULIANDAY('%s'),%d,%d,%d,JULIANDAY('%s'),%d") % GetStartTime() % PathID % getclid(_commandline) % _UserID % BoostToSQLite(ExitTime) % GetParentID();
+	 
+	 
 
-	 clSQL << "INSERT INTO Process(CreationTime,PathID,CLID,UserID,";
+
+	 /*clSQL << "INSERT INTO Process(CreationTime,PathID,CLID,UserID,";
 		 if (!parent)
 			 clSQL << "Destruction";
 		 
@@ -177,7 +176,7 @@ extern map<HANDLE, CProcessInfo> process_map;
 	 clSQL << "'),";
  }
 	clSQL<<GetParentID();
-	clSQL<<");";
+	clSQL<<");";*/
 	
 	char * szErr;
 	{

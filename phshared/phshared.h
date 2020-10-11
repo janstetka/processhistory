@@ -1,7 +1,7 @@
 #ifndef PHSHAREH
 #define PHSHAREH
 
-#include <windows.h>//win32
+//#include <windows.h>//win32
 #include "..\sqlite\sqlite3.h"
 #include <string>
 #include "boost/date_time/posix_time/posix_time.hpp"

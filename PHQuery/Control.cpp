@@ -20,8 +20,6 @@ extern PHQuery phq;
 ptime wr,wl;
 extern mutex db_mutex;
 
-mutex work_mtx;
-
 void PHJump(string SQL, time_duration td);
 struct LRTdata
 {
@@ -40,16 +38,16 @@ void LeftRightThread(LRTdata lrt)
 	}
 	else
 	{
-		ostringstream os;
-		os << lrt.s;
+		string os;
+		os = lrt.s;
 		//check for processes further than one screen width
 
 		if (FilterUser())
-			os << " AND USERID=" << phd.filterUserID;
+			os += " AND USERID=" +to_string( phd.filterUserID);
 		if (FilterExec())
-			os << " AND PathID=" << phd.filterPathID;
-		os << ";";
-		PHJump(os.str(), lrt.td);
+			os += " AND PathID=" +to_string( phd.filterPathID);
+		os += ";";
+		PHJump(os, lrt.td);
 	}
 }
 
@@ -68,7 +66,7 @@ void LeftRight(WPARAM wParam)
 		
 		ostringstream os;
 		LRTdata lrtd;
-		os << "SELECT DATETIME(MIN(CreationTime)) FROM Process WHERE CreationTime> JULIANDAY('" << BoostToSQLite(wr) << "')";
+		os << boost::format("SELECT DATETIME(MIN(CreationTime)) FROM Process WHERE CreationTime> JULIANDAY('%s')") % BoostToSQLite(wr);
 		lrtd.s = os.str();
 		lrtd.td=time_duration(0, 0, 0);
 		thread st(LeftRightThread, lrtd);
@@ -85,7 +83,7 @@ void LeftRight(WPARAM wParam)
 		phq.SetSQL(where);
 
 		ostringstream os;
-		os << "SELECT DATETIME(MAX(Destruction)) From Process WHERE Destruction < JULIANDAY('" << BoostToSQLite(wl) << "')";
+		os << boost::format("SELECT DATETIME(MAX(Destruction)) From Process WHERE Destruction < JULIANDAY('%s')") %  BoostToSQLite(wl) ;
 		lrtd.s = os.str();
 		phd._complete = false;
 		thread st(LeftRightThread, lrtd);
@@ -268,8 +266,8 @@ string ModifiedConstruct(ptime Begin,ptime end)
 	string begin_txt=BoostToSQLite(Begin),end_txt=BoostToSQLite(end);
 
 	//assert(!begin_txt.empty() || !end_txt.empty());
-	os<<"SELECT JULIANDAY('"	<< begin_txt	<<"'),JULIANDAY('"
-	<<end_txt	<<"');";
+	os<<boost::format("SELECT JULIANDAY('%s'),JULIANDAY('%d');") % begin_txt % end_txt;
+	
 
 	sqlite3 *db;
 	sqlite3_stmt* stmt;
@@ -298,18 +296,11 @@ string ModifiedConstruct(ptime Begin,ptime end)
 	os.str("");
 	if (phd.filter_exec || phd.filterUserID > 0)
 		os << " ( ";
-	/*Starts within times - events too*/
-	os<<"( CreationTime>"	<<bjtxt	<<" AND CreationTime<"	<<ejtxt
-
-	/*Ends within times*/
-	<<" AND Destruction NOTNULL ) OR ( Destruction<"	<<ejtxt	<<" AND Destruction>"	<<bjtxt
-	<<" AND Destruction NOTNULL)";
-	if(phq.long_processes)
-	{
-	/*Overlaps times*/
-		os<<" OR ( CreationTime<"	<<bjtxt	<<" AND Destruction>"	<<ejtxt
-		<<" AND Destruction NOTNULL) ";
-	}
+	/*Starts within times - events too*//*Ends within times*/
+	os<<boost::format("( CreationTime>%s AND CreationTime<%s AND Destruction NOTNULL ) OR ( Destruction<%s AND Destruction>%s AND Destruction NOTNULL)") % bjtxt % ejtxt % ejtxt % bjtxt;
+	if(phq.long_processes)/*Overlaps times*/
+		os<<boost::format(" OR ( CreationTime<%s AND Destruction>%s AND Destruction NOTNULL) ")%bjtxt % ejtxt;
+	
 	if (phd.filter_exec || phd.filterUserID > 0)
 			os << " ) ";
 	if(phd.filter_exec)
@@ -321,119 +312,7 @@ string ModifiedConstruct(ptime Begin,ptime end)
 	return SQL;
 }
 
-struct Worker4Thread
-{
-	date start;
-	CComboBox m_Combo;
-	string s;
-	HWND h;
-	CMPSBarWithProgress* m_sBar;
-};
-//using namespace boost;
-void Worker4(Worker4Thread w4t)
-{
-	lock_guard<mutex> sl(work_mtx);
-	month_iterator titr(w4t.start,1);
-	w4t.m_sBar->ProgSetRange(0,12);
-	sqlite3 *db=OpenDB();
-	for(;titr<=date(boost::lexical_cast<int>(w4t.s),12,31);++titr)
-	{
-		ostringstream os;
-		os<<"SELECT ID FROM Process"
-			<<	ModifiedConstruct(ptime(*titr,minutes(0)),ptime(*titr+months(1),minutes(0)));
-		os<<";";
-		
-		
-		sqlite3_stmt* stmt;
-		if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
-			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
-
-		date monthit=*titr;
-			
-		if(sqlite3_step(stmt)== SQLITE_ROW )
-			w4t.m_Combo.AddString(to_iso_extended_string(monthit).substr(0,7).c_str());
-			
-		sqlite3_finalize(stmt);
-			
-		w4t.m_sBar->ProgSetPos(monthit.month());
-	}
-	sqlite3_close(db);	
-	w4t.m_sBar->ProgSetPos(0);
-}
-
-void Worker7(Worker4Thread w4t)
-{
-	lock_guard<mutex> sl(work_mtx);
-	day_iterator ditr(w4t.start);
-	w4t.m_sBar->ProgSetRange(0,w4t.start.end_of_month().day());
-	sqlite3 *db=OpenDB();
-	for(;ditr<=w4t.start.end_of_month();++ditr)
-	{
-		ostringstream os;
-		os<<"SELECT ID FROM Process"
-		<<	ModifiedConstruct(ptime(*ditr,minutes(0)),ptime(*ditr+days(1),minutes(0)));
-		os<<";";
-		
-		sqlite3_stmt* stmt;
-		if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
-			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
-		if(sqlite3_step(stmt)== SQLITE_ROW )
-			w4t.m_Combo.AddString(to_iso_extended_string(*ditr).c_str());
-		sqlite3_finalize(stmt);
-				
-		w4t.m_sBar->ProgSetPos(ditr->day());
-	}
-	sqlite3_close(db);
-	w4t.m_sBar->ProgSetPos(0);
-}
-/*for each ROW returned to find out when any processes start in hour*/
-void Worker10(Worker4Thread w4t)
-{
-	lock_guard<mutex> sl(work_mtx);
-	time_iterator hitr(ptime(w4t.start),hours(1));
-	w4t.m_Combo.ResetContent();
-	w4t.m_sBar->ProgSetRange(0,24);
-	sqlite3 *db=OpenDB();
-	for(;hitr<ptime(w4t.start,hours(24));++hitr)
-	{
-		ostringstream os;
-		os<<"SELECT DATETIME(MIN(CreationTime)) FROM Process"
-			<<	ModifiedConstruct(*hitr,(*hitr)+hours(1));
-		os<<";";
-		
-		sqlite3_stmt* stmt;
-		if(sqlite3_prepare(db,os.str().c_str(),-1,&stmt,NULL)!=SQLITE_OK)
-			DBError(sqlite3_errmsg(db),__LINE__,__FILE__);
-				//PHTrace(os.str(),__LINE__,__FILE__);
-		if(sqlite3_step(stmt)== SQLITE_ROW )
-		{
-			const unsigned char * firstinhour=0;
-			firstinhour = sqlite3_column_text(stmt,0);
-			ptime start_in_hour;
-			if(firstinhour!=0)
-			{
-				try
-				{
-					start_in_hour=time_from_string((const char *)firstinhour);
-				}
-				catch(std::exception &)
-				{
-					PHTrace("time_from_string failed",__LINE__,__FILE__);
-				}
-				if(start_in_hour>=*hitr && start_in_hour<=*hitr+hours(1))
-					w4t.m_Combo.AddString(to_iso_extended_string(start_in_hour).replace(10,1," ").substr(0,16).c_str());
-				else
-					w4t.m_Combo.AddString(to_iso_extended_string(*hitr).replace(10,1," ").substr(0,16).c_str());
-			}
-		}
-		sqlite3_finalize(stmt);
-		
-		w4t.m_sBar->ProgSetPos(static_cast<int>(hitr->time_of_day().hours()));
-	}
-	sqlite3_close(db);	
-	w4t.m_sBar->ProgSetPos(0);
-}
-
+#include "..\ProcessHistory\Drilldown.h"
 void CMainFrame::ParseQry()
 {
 	char q[100];
@@ -503,7 +382,7 @@ void CMainFrame::ParseQry()
 	{
 		m_Combo.GetWindowText(q,ql+1);
 		string s=string(q);
-		ostringstream os;
+		//ostringstream os;
 		date startd;
 		try
 		{
@@ -563,8 +442,8 @@ LRESULT CMainFrame::OnProcessViewSelected(WORD /*wNotifyCode*/, WORD /*wID*/, HW
 	return 0;
 	
 }
-#include <boost/filesystem.hpp>
-using namespace boost::filesystem;
+#include <filesystem>
+//using namespace boost::filesystem;
 LRESULT CMainFrame::OnExecRunSel(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	if(phd._selected>0)
@@ -572,7 +451,7 @@ LRESULT CMainFrame::OnExecRunSel(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWnd
 		map<long,string>::iterator qpit=phd.qrypaths.find(phd._selected);
 		if(qpit!=phd.qrypaths.end())
 		{
-			if ( exists(qpit->second))
+			if ( filesystem::exists(qpit->second))
 			{
 			if(!ShellExecute(NULL, "Open",qpit->second.c_str(),NULL,NULL,SW_SHOWDEFAULT))
 				PHTrace(Win32Error(),__LINE__,__FILE__);
@@ -593,7 +472,7 @@ LRESULT CMainFrame::OnExecOCF(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl
 		map<long,string>::iterator qpit=phd.qrypaths.find(phd._selected);
 		if(qpit!=phd.qrypaths.end())
 		{
-			if ( exists(qpit->second))
+			if ( filesystem::exists(qpit->second))
 			{
 			command +=qpit->second;
 			
@@ -687,21 +566,21 @@ LRESULT CMainFrame::GoToMostRecent(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 {		
 	sqlite3 *db;
 	sqlite3_stmt* stmt;
-	ostringstream os;
-	os << "SELECT DATETIME(MAX(Destruction)) FROM Process";
+	string os;
+	os += "SELECT DATETIME(MAX(Destruction)) FROM Process";
 	if (FilterUser() || FilterExec())
-		os << " WHERE ";
+		os += " WHERE ";
 	if (FilterUser())
-		os << " USERID=" << phd.filterUserID;
+		os += " USERID=" + to_string(phd.filterUserID);
 	if (FilterUser() && FilterExec())
-		os << " AND ";
+		os += " AND ";
 		if(FilterExec())
-		os << " PathID=" << phd.filterPathID;
-	os << ";";
+		os += " PathID=" +to_string( phd.filterPathID);
+	os += ";";
 	{
 		lock_guard<mutex> sl(db_mutex);
 		db = OpenDB();
-		if (sqlite3_prepare(db, os.str().c_str(), -1, &stmt, NULL) != SQLITE_OK)
+		if (sqlite3_prepare(db, os.c_str(), -1, &stmt, NULL) != SQLITE_OK)
 			DBError(sqlite3_errmsg(db), __LINE__, __FILE__);
 	}
 	if(sqlite3_step(stmt)== SQLITE_ROW )
@@ -830,9 +709,9 @@ LRESULT CMainFrame::OnFont(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/,
 LRESULT CMainFrame::OnSettings(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	SettingsCtrl ctrl;
-	ctrl._Refresh = boost::lexical_cast<string>(logger._Refresh);
+	ctrl._Refresh = to_string(logger._Refresh);
 	ctrl.DoModal();
-	logger._Refresh = boost::lexical_cast<int>(ctrl._Refresh);
+	logger._Refresh = stoi(ctrl._Refresh);
 	return 0;
 }
 //doesn't behave quite right when no results leaves last query on screen but doesn't redraw it.

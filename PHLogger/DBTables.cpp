@@ -3,7 +3,7 @@
 
 using namespace std;
 
-//extern mutex db_mutex;
+//TODOmake this c
 
 void CreateTables()
 {

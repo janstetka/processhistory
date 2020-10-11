@@ -102,11 +102,11 @@ ptime rb = microsec_clock::local_time();
 			set_difference(OldProcesses.begin(), OldProcesses.end(), Processes.begin(), Processes.end(), inserter(result, result.end()));
 
 
-			set<HANDLE>::iterator it;
-			for (it = result.begin(); it != result.end(); it++)
+			//set<HANDLE>::iterator it;
+			for (auto & it : result)
 			{
 				unique_lock<mutex> lock(stop_mtx);
-				stop_queue.push(*it);
+				stop_queue.push(it);
 				cv_stop.notify_one();
 			}
 
@@ -115,7 +115,7 @@ ptime rb = microsec_clock::local_time();
 ProcessHackerCleanUp();
 ptime re = microsec_clock::local_time();
 		time_duration rtd= re - rb;
-		::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" pm# "+ boost::lexical_cast<string>(process_map.size())).c_str());
+		//::SetWindowText(ph_instance._hWndStatusBar, (to_simple_string(rtd)+" pm# "+ boost::lexical_cast<string>(process_map.size())).c_str());
 	}
 		/* Do not forget to clean up the snapshot object. */
 

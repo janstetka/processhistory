@@ -1,6 +1,6 @@
 #include "..\phshared\phshared.h"
 #include <mutex>
-#include "boost/algorithm/string.hpp"
+//#include "boost/algorithm/string.hpp"
 #include "..\phlogger\phlogger.h"
 
 using namespace std;
@@ -13,7 +13,11 @@ extern mutex db_mutex;
 sqlite3_int64 GetPathID(string path)
 {
 	//boost::mutex::scoped_lock psl(paths_mtx);	
-	to_lower(path);
+	//to_lower(path);
+	for (auto& c : path)
+	{
+		c = tolower(c);
+	}
 	map<string, sqlite3_int64>::iterator path_it=PHPaths.find(path);
 	sqlite3_int64 PathID=-1;
 

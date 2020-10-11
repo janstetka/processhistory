@@ -3,12 +3,13 @@
 #include "..\PHQuery\screen.h"
 //#include "..\PHQuery\resource.h"
 #include "PHScroll.h"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <mutex>
+#include "boost/format.hpp"
 
 using namespace boost::posix_time;
 using namespace std;
-using namespace boost::filesystem;
+//using namespace boost::filesystem;
 
 extern PHQuery phq;
 extern PHDisplay phd;
@@ -187,7 +188,7 @@ void PHTimeScale::DrawTimeAxis()
 			zero="";
 		else	
 			zero="0";
-		string TimeText = boost::lexical_cast<string>(pti.time_of_day().hours()) + ":" + zero + boost::lexical_cast<string>(pti.time_of_day().minutes());
+		string TimeText = to_string(pti.time_of_day().hours()) + ":" + zero + to_string(pti.time_of_day().minutes());
 					
 		RECT r;
 		r.left = 0;
@@ -233,14 +234,8 @@ void PHTimeInfo::DisplayInfo()
 	{
 		lock_guard<mutex> sl(db_mutex);
 			
-		ostringstream os;
-		os <<
-			"SELECT CommandLine FROM Process  JOIN CommandLines ON Process.clid=CommandLines.ID WHERE Process.ID=";
-		
-			os << _ID;
-		
-			os<<";";
-			if (sqlite3_prepare(tidb, os.str().c_str(), -1, &stmt, NULL) != SQLITE_OK)
+		string os=			"SELECT CommandLine FROM Process  JOIN CommandLines ON Process.clid=CommandLines.ID WHERE Process.ID="+ to_string(_ID)+";";
+			if (sqlite3_prepare(tidb, os.c_str(), -1, &stmt, NULL) != SQLITE_OK)
 				DBError(sqlite3_errmsg(tidb), __LINE__, __FILE__);
 		const unsigned char *commandline=0;
 		if(sqlite3_step(stmt)== SQLITE_ROW )
@@ -251,14 +246,10 @@ void PHTimeInfo::DisplayInfo()
 		}
 		sqlite3_finalize(stmt);
 		
-		ostringstream os2;
-		os2 << "SELECT UserName FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= ";
-
-			os2 << _ID;
-
-		os2 << ";";
+		string os2;
+		os2 = "SELECT UserName FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= "+to_string(_ID)+";";
 		
-		if(sqlite3_prepare(tidb,os2.str().c_str(),-1,&stmt2,NULL)!=SQLITE_OK)
+		if(sqlite3_prepare(tidb,os2.c_str(),-1,&stmt2,NULL)!=SQLITE_OK)
 			DBError(sqlite3_errmsg(tidb),__LINE__,__FILE__);
 		const unsigned char *user;
 		
@@ -278,7 +269,7 @@ void PHTimeInfo::DisplayInfo()
 		{
 			pathtxt=qpit->second;
 
-			if ( exists(pathtxt))
+			if ( std::filesystem::exists(pathtxt))
 			{
 
 			GetVersionInfo(Product,Description,pathtxt);
@@ -314,14 +305,14 @@ void PHTimeInfo::DisplayInfo()
 	}	
 
 	ostringstream dlgos;
-	dlgos<<"Start "<<to_simple_string(pclProcess.start)<<" End "<<to_simple_string(pclProcess.end)	
+	/*dlgos<<"Start "<<to_simple_string(pclProcess.start)<<" End "<<to_simple_string(pclProcess.end)	
 	<<" Duration "<<to_simple_string(ProcessDuration)<<"\r\n"
 	
 	<<"User: "<<usertxt;
 
 	dlgos << "\r\n" << "Path: " << pathtxt << "\r\n" << "Command line: " << cltxt << "\r\n" << Product << " " << Description
-		<< "\r\n" << bintxt << "\r\n";
-
+		<< "\r\n" << bintxt << "\r\n";*/
+	dlgos << boost::format("Start %s End %s Duration %s \r\nUser: %s \r\nPath: %s \r\nCommand line: %s \r\nProduct %s Description\r\n%s") % pclProcess.start % pclProcess.end % ProcessDuration % usertxt % pathtxt % cltxt % Product % Description % bintxt;
 
 		_ps = dlgos.str();
 

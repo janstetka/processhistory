@@ -4,13 +4,13 @@
 #include <sstream>
 #include "query.h"
 #include "screen.h"
-#if defined (_WIN64)
+//#if defined (_WIN64)
 #include <mutex>
-#else
+/*#else
 #include "boost\thread\mutex.hpp"
 #include <boost\thread\lock_guard.hpp> 
 using namespace boost;
-#endif
+#endif*/
 
 using namespace boost::posix_time;
 using namespace std;
@@ -72,10 +72,10 @@ void PHQuery::Layout(list<PHProcess> clOrdered )
 	ProcessLayout pl;
 	
 	_lCount = 1;
-	for(list<PHProcess>::iterator oi=clOrdered.begin(); oi!=clOrdered.end();oi++)
+	for(auto & oi : clOrdered)
 	{
 		CPHExtent clExtent;
-		PHProcess php=*oi;
+		PHProcess php=oi;
 		clExtent.tStart=php.start;
 		clExtent.tEnd=php.end;
 		if (clExtent.tEnd - clExtent.tStart < seconds(1))
