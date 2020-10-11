@@ -3,13 +3,7 @@
 #include "..\screen.h"
 #include "..\PH.h"
 #include "..\query.h"
-#if defined (_WIN64)
 #include <mutex>
-#else
-#include "boost\thread\mutex.hpp"
-#include <boost\thread\lock_guard.hpp> 
-using namespace boost;
-#endif
 #include "..\..\phshared\phshared.h"
 
 extern PHDisplay phd;
@@ -39,16 +33,15 @@ LRESULT PHScroll::OnRB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled
 			PHLToD(rold);
 		}
 
-	for (map<long, RECT>::iterator it = phd._ProcessAreas.begin();
-		it != phd._ProcessAreas.end(); it++)
+	for (auto & it : phd._ProcessAreas)
 	{
 		//found process right clicked on
-		if (PtInRect(&it->second, pt))
+		if (PtInRect(&it.second, pt))
 		{
-			phd._selected = it->first;
+			phd._selected = it.first;
 
-			DrawProcess(it->first, it->second);
-			RECT r = it->second;
+			DrawProcess(it.first, it.second);
+			RECT r = it.second;
 			PHLToD(r);
 			InvalidateRect(&r);
 			if (sit != phd._ProcessAreas.end())
@@ -90,7 +83,7 @@ LRESULT PHScroll::OnLB(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 }
 // wParam = current progress. lParam = total progress.
 #define UWM_DOWNLOAD_PROGRESS   (WM_APP)
-LRESULT PHScroll::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+/*LRESULT PHScroll::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& )
 {
 	if (!phd._complete)
 		return TRUE;
@@ -103,14 +96,13 @@ LRESULT PHScroll::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*b
 	pt.x = x;
 	pt.y = y;
 	PHDToL(pt);
-	for (map<long, RECT>::iterator it = phd._ProcessAreas.begin();
-		it != phd._ProcessAreas.end(); it++)
+	for (auto & it : phd._ProcessAreas)
 	{
-		if (PtInRect(&it->second, pt))
+		if (PtInRect(&it.second, pt))
 		{
-			if (phd._mouseover != it->first)// process ID update phti - only send message if different from last time
+			if (phd._mouseover != it.first)// process ID update phti - only send message if different from last time
 			{
-				phd._mouseover = it->first;
+				phd._mouseover = it.first;
 				::PostMessage(ph_instance._hWnd, UWM_DOWNLOAD_PROGRESS, 2, 0);
 			}
 			return TRUE;
@@ -122,7 +114,7 @@ LRESULT PHScroll::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& /*b
 		::PostMessage(ph_instance._hWnd, UWM_DOWNLOAD_PROGRESS, 3, 0);		
 	}
 	return TRUE;
-}
+}*/
 
 void PHScroll::SetSize(SIZE m_size)
 {		
@@ -171,7 +163,7 @@ LRESULT PHScroll::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOO
 	return true;
 }
 
-extern map<string, long> g_clUser;
+extern map<string, sqlite3_int64> g_clUser;
 
 void CMainFrame::FillUserList()
 {
@@ -181,7 +173,7 @@ void CMainFrame::FillUserList()
 	if (length>0)
 		::GetWindowText(ph_instance._hWndCombo3, User, length+1);
 	m_Combo3.ResetContent();
-	for (map<string, long>::iterator it = g_clUser.begin(); it != g_clUser.end();it++)
+	for (map<string, sqlite3_int64>::iterator it = g_clUser.begin(); it != g_clUser.end();it++)
 			m_Combo3.AddString(it->first.c_str());
 	m_Combo3.AddString("All");
 	int sel=m_Combo3.FindString(0,User);
@@ -352,10 +344,10 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 		int length = GetWindowTextLength(ph_instance._hWndCombo3);
 		if (length>0)
 			GetWindowText(ph_instance._hWndCombo3, User, length+1);
-		map<string,long>::iterator it = g_clUser.find(string(User));
+		map<string, sqlite3_int64>::iterator it = g_clUser.find(string(User));
 		if (it != g_clUser.end())
 		{
-			phd.filterUserID = it->second;
+			phd.filterUserID = static_cast<int>(it->second);
 			return true;
 		}
 		else
@@ -364,7 +356,7 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 			return false;
 		}
 	}
-//#include "..\..\phshared\Crc32Static.h"
+
 	set<string> PathSet;
 	bool /*CMainFrame::*/FilterExec()
 	{
@@ -377,20 +369,12 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 			phd.filter_exec = false;
 			 return false;
 		}
-		/*DWORD dwCRC=-1;
-#if defined (_WIN64)
-		CCrc32Static::FileCrc32Win32(Path, dwCRC);
-#else
-		CCrc32Static::FileCrc32Assembly(Path, dwCRC);
-#endif
-		
-		phd.filterCRC = dwCRC;*/
+
 		lock_guard<mutex> sl(db_mutex);
-		ostringstream os2;
-		os2 << "SELECT Paths.ID FROM Process JOIN Paths ON Process.PathID = Paths.ID WHERE Paths.Path=" << Path << ";";
+		string os2="SELECT Paths.ID FROM Process JOIN Paths ON Process.PathID = Paths.ID WHERE Paths.Path=" + string(Path) + ";";
 		sqlite3 *db2 = OpenDB();
 		sqlite3_stmt* stmt2;
-		if (sqlite3_prepare(db2, os2.str().c_str(), -1, &stmt2, NULL) != SQLITE_OK)
+		if (sqlite3_prepare(db2, os2.c_str(), -1, &stmt2, NULL) != SQLITE_OK)
 			DBError(sqlite3_errmsg(db2), __LINE__, __FILE__);
 		if (sqlite3_step(stmt2) == SQLITE_ROW)
 		{
@@ -434,7 +418,7 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 		}
 	}
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 	LRESULT CMainFrame::OnExecRunSelWCL(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
@@ -443,17 +427,13 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 			map<long, string>::iterator qpit = phd.qrypaths.find(phd._selected);
 			if (qpit != phd.qrypaths.end())
 			{
-				if (boost::filesystem::exists(qpit->second))
+				if (filesystem::exists(qpit->second))
 				{
 					lock_guard<mutex> sl(db_mutex);
 					sqlite3 *db = OpenDB();
 					sqlite3_stmt * stmt;
-					ostringstream os;
-					os <<
-						"SELECT CommandLine FROM Process  JOIN CommandLines ON Process.clid=CommandLines.ID WHERE Process.ID=";
-					os << phd._selected;
-					os << ";";
-					if (sqlite3_prepare(db, os.str().c_str(), -1, &stmt, NULL) != SQLITE_OK)
+					string os="SELECT CommandLine FROM Process  JOIN CommandLines ON Process.clid=CommandLines.ID WHERE Process.ID="+to_string( phd._selected)+ ";";
+					if (sqlite3_prepare(db, os.c_str(), -1, &stmt, NULL) != SQLITE_OK)
 						DBError(sqlite3_errmsg(db), __LINE__, __FILE__);
 					const unsigned char *commandline = 0;
 					string cltxt;
@@ -464,7 +444,7 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 						{//strip out path
 							cltxt = (char*)commandline;
 							ReplaceStringInPlace(cltxt, qpit->second, "");
-							if ((int)ShellExecute(NULL, "Open", qpit->second.c_str(), cltxt.c_str(), NULL, SW_SHOWDEFAULT)<33)
+							if (!ShellExecute(NULL, "Open", qpit->second.c_str(), cltxt.c_str(), NULL, SW_SHOWDEFAULT))
 								PHTrace(Win32Error(), __LINE__, __FILE__);
 						}
 					}
@@ -480,18 +460,14 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 	}
 	LRESULT CMainFrame::OnSetUserFilter(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
-		ostringstream os2;
-		os2 << "SELECT UserName FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= ";
-
-		os2 << phd._selected;
-		os2 << ";";
+		string os2= "SELECT UserName FROM Process JOIN PHLogUser ON Process.UserID=PHLogUser.ID WHERE Process.ID= "+ to_string(phd._selected)+ ";";
 		sqlite3 *db2 = OpenDB();
 		sqlite3_stmt* stmt2;
-		if (sqlite3_prepare(db2, os2.str().c_str(), -1, &stmt2, NULL) != SQLITE_OK)
+		if (sqlite3_prepare(db2, os2.c_str(), -1, &stmt2, NULL) != SQLITE_OK)
 			DBError(sqlite3_errmsg(db2), __LINE__, __FILE__);
 		const unsigned char *user=0;
 		//string usertxt;
-		int userid;
+		//int userid;
 		if (sqlite3_step(stmt2) == SQLITE_ROW)
 			user = sqlite3_column_text(stmt2, 0);
 			
