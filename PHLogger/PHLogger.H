@@ -21,6 +21,8 @@ struct qi
 HANDLE ID;
 SYSTEMTIME st;
 HANDLE parentID;
+boost::posix_time::ptime pt;
+bool operator<(qi const &other) const { return pt< other.pt;}
 };
 
 /*Only one instance of this class is allowed, singleton*/

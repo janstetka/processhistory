@@ -4,6 +4,8 @@
 #include "..\..\phlib\include\lsasup.h"
 #include <wchar.h>
 
+//uses undocumented kernel functions interface provided by process hacker library. minimises code to maintain & old code with vulnerabilities. makes it possible to do most operations without admin priveleges apart from getprocesstimes
+//avoids toolhelp functions although the undocumentated kernel process enumeration still page faults
 
 PWSTR PhpGetStringOrNa(
     __in PPH_STRING String
@@ -116,31 +118,36 @@ PROCESS_EXTENDED_BASIC_INFORMATION basicInfo;
 PSYSTEM_PROCESS_INFORMATION process;
 PVOID processes;
 
-VOID ProcessHackerInitialGetProcess(phqi* qi)
+NTSTATUS ProcessHackerInitialGetProcess(phqi* qi)
 {
 
 //InheritedFromUniqueProcessId;TODO 2020 could use this
 	if (!NT_SUCCESS(PhEnumProcesses(&processes)))
-        return ;
+        return -1;
 		
 	process = PH_FIRST_PROCESS(processes);
-	if (process)
-	{
-		qi->ID= process->UniqueProcessId;
+    if (process)
+    {
+        qi->ID = process->UniqueProcessId;
         PhLargeIntegerToLocalSystemTime(&qi->st, &process->CreateTime);
         qi->parentID = process->InheritedFromUniqueProcessId;
-		}
+        return 0;
+    }
+    else
+        return -1;
 }
 
-VOID ProcessHackerGetNextProcess(phqi* qi)
+NTSTATUS ProcessHackerGetNextProcess(phqi* qi)
 {
 	process = PH_NEXT_PROCESS(process);
-	if (process)
-	{
-		qi->ID= process->UniqueProcessId;
-	PhLargeIntegerToLocalSystemTime(&qi->st, &process->CreateTime);
-    qi->parentID = process->InheritedFromUniqueProcessId;
-	}
+    if (process)
+    {
+        qi->ID = process->UniqueProcessId;
+        PhLargeIntegerToLocalSystemTime(&qi->st, &process->CreateTime);
+        qi->parentID = process->InheritedFromUniqueProcessId;
+        return 0;
+    }
+    else return -1;
 }
 void ProcessHackerCleanUp()
 {

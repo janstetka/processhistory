@@ -3,6 +3,7 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include <mutex>
 #include <queue>
+#include <set>
 #include <..\PHQuery\ph.h>
 #include "..\background\phacker.h"
 
@@ -19,44 +20,74 @@ mutex db_mutex;
 extern mutex start_mtx, stop_mtx;
 extern condition_variable cv_start, cv_stop;
 
-extern queue<qi> start_queue;
+extern set<qi> start_queue;
 extern queue<HANDLE> stop_queue;
 extern PH ph_instance;
-void StartEvent()
+
+extern ptime rb;
+
+void StartEvent()//empty queues  under lock, process outtside lock
 {
-	while (logger._Refresh > -1) {
+	while (logger._Refresh > -1) 
+	{
 		qi P;
-		{
-		unique_lock<mutex> lk(start_mtx);
-		while (start_queue.empty())
-			cv_start.wait(lk);
-		if (start_queue.empty())
-			continue;
-		//if (start_queue.size() > 1)
-		//	::SetWindowText(ph_instance._hWndStatusBar, ("STARTQ "+boost::lexical_cast<string>(start_queue.size())).c_str()); 
-		P = start_queue.front();
-		//::SetWindowText(ph_instance._hWndStatusBar, ("START PID " + boost::lexical_cast<string>(PID)).c_str());
-		start_queue.pop();
-	}
-		logger.StartEvent(P);
-	}
-}
-void StopEvent()
+		bool process_start;
+		{//lock the condition variable		& queue
+		
+			unique_lock<mutex> lk(start_mtx);
+			if(start_queue.empty())
+			{
+				// start q empty now process stop q 
+				cv_stop.notify_one();//todo could check if anything in stop q before notifying
+				cv_start.wait(lk);// every time queue is filled will stop waiting
+				process_start=false;
+			}
+			else
+			{
+				P = *start_queue.rbegin();//take oldest first
+				start_queue.erase(*start_queue.rbegin());
+				process_start=true;
+			}
+		}//lock
+		if(process_start)
+			logger.StartEvent(P);
+	}	//while
+	
+		
+					//timing - refresh interval should not be less than time refresh takes
+			//ptime re = microsec_clock::local_time();
+			//time_duration rtd= re - rb;
+			//rtds=to_simple_string(rtd);
+} //SE
+void StopEvent() // process one check start queue is empty, continue
 {
-	while (logger._Refresh > -1) {
-		HANDLE PID;
+	while (logger._Refresh > -1) 
+	{
+		HANDLE PID=NULL;
+		bool startq=false;
+		{//hand back to the start queue processing if that's not empty
+			unique_lock<mutex> lk(start_mtx);
+			if(start_queue.empty())// start q not empty 				
+				//cv_start.notify_one();
+				startq=false;
+			else
+				startq=true;
+		}//mtx		
 		{
 			unique_lock<mutex> lk(stop_mtx);
-			while (stop_queue.empty())
+			if(startq)
 				cv_stop.wait(lk);
-			if (stop_queue.empty())
-				continue;
-			/*if (stop_queue.size() > 1)
-				::SetWindowText(ph_instance._hWndStatusBar, ("STOPQ "+boost::lexical_cast<string>(stop_queue.size())).c_str());*/
-			PID = stop_queue.front();
-			stop_queue.pop();
-		}
-		logger.StopEvent(PID);
+			if(stop_queue.empty())
+				cv_stop.wait(lk);
+			else 
+			{
+				PID = stop_queue.front();
+				stop_queue.pop();
+			}
+					
+		}//lock
+		if(PID!=NULL)
+			logger.StopEvent(PID);
 	}
 }
 
@@ -121,13 +152,16 @@ public:
 			//_Exit= from_ftime<ptime>(ftExit);
 			//_Exit=c_local_adjustor<ptime>::utc_to_local(_Exit);
 			_Exit = ptime(boost::gregorian::date(ftExit.wYear, ftExit.wMonth, ftExit.wDay), hours(ftExit.wHour) + minutes(ftExit.wMinute) + seconds(ftExit.wSecond) + milliseconds(ftExit.wMilliseconds));
-			// TODO 2020 can anything else be done here - path etc to save time in constructor - most info has to be gathered immediately incase process ends
-			// todo 2020 review use of stringstream - boost format or std::format in C++20
-			// seperate bits of code such as drill down that aren't core / use a bottom pane for list of events in that time period(go back to details dialog) -  recording parent process start (if not already dead) 
-			// owner drawn list?
-			// review use of boost - has anything else used become standard? lexical cast, filesystem etc.
-			// anything else modern c++ e.g. iterators now range - only in bits of code that are core
-			// don't do mouseover
+			// ++TODO 2020 can anything else be done here - path etc to save time in constructor - most info has to be gathered immediately incase process ends
+			// [todo 2020 review use of stringstream - boost format or std::format in C++20]
+			// +seperate bits of code such as drill down that aren't core / use a bottom pane for list of events in that time period(go back to details dialog) -  recording parent process start (if not already dead) 
+			// ++owner drawn list?
+			// [review use of boost - has anything else used become standard? lexical cast, filesystem etc.
+			// anything else modern c++ e.g. iterators now range - only in bits of code that are core]
+			// ++don't do mouseover
+			// ++is it possible to stop using nowide
+			//perf - keep db open /minimum open calls
+			//++notify (consolidate- LRThread, context worker & worker ) single thread rather than create new - better control - gui waits for start events to be logged. notify a wait that waits if enumeration or start events are busy
 		}
 		catch(...)
 		{

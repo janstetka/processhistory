@@ -10,8 +10,8 @@ typedef	struct phqi {
 PWSTR PHiGetCommandLine(HANDLE h);
 VOID ProcessHackerStart(HINSTANCE hi);
 //void Dereference(PPH_STRING str);
-VOID ProcessHackerInitialGetProcess(phqi *qi); //long& PID, SYSTEMTIME& creation, long& parentID);
-VOID ProcessHackerGetNextProcess(phqi *qi); //long& PID, SYSTEMTIME& creation, long& parentID);
+NTSTATUS ProcessHackerInitialGetProcess(phqi *qi); //long& PID, SYSTEMTIME& creation, long& parentID);
+NTSTATUS ProcessHackerGetNextProcess(phqi *qi); //long& PID, SYSTEMTIME& creation, long& parentID);
 void ProcessHackerCleanUp();
 PWSTR PHackGetImageFile(HANDLE ProcessId, HANDLE h);
 VOID PhpEnablePrivileges(VOID);

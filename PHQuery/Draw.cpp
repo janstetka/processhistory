@@ -1,5 +1,5 @@
 /*Renders the query results using 
-GDI */
+GDI+ */
 #include "..\ProcessHistory\MainFrm.h"
 #include "screen.h"
 #include "query.h"
@@ -173,16 +173,9 @@ _MemDC->SetTextColor(old_txt);
 	}/*end process*/
 
 #include <filesystem>
-//#if defined (_WIN64)
 #include <mutex>
-/*#else
-#include "boost\thread\mutex.hpp"
-#include <boost\thread\lock_guard.hpp> 
-	using namespace boost;
-#endif*/
 
 extern mutex db_mutex;
-//using namespace boost::filesystem;
 
 void PHDisplay::ReadPaths()// base on paths.id avoids duplication 
 {

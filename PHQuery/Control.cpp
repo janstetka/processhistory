@@ -66,7 +66,7 @@ void LeftRight(WPARAM wParam)
 		
 		ostringstream os;
 		LRTdata lrtd;
-		os << boost::format("SELECT DATETIME(MIN(CreationTime)) FROM Process WHERE CreationTime> JULIANDAY('%s')") % BoostToSQLite(wr);
+		os << boost::format("SELECT DATETIME(MIN(CreationTime)) FROM Process WHERE CreationTime> JULIANDAY('%s');") % BoostToSQLite(wr);
 		lrtd.s = os.str();
 		lrtd.td=time_duration(0, 0, 0);
 		thread st(LeftRightThread, lrtd);
@@ -83,7 +83,7 @@ void LeftRight(WPARAM wParam)
 		phq.SetSQL(where);
 
 		ostringstream os;
-		os << boost::format("SELECT DATETIME(MAX(Destruction)) From Process WHERE Destruction < JULIANDAY('%s')") %  BoostToSQLite(wl) ;
+		os << boost::format("SELECT DATETIME(MAX(Destruction)) From Process WHERE Destruction < JULIANDAY('%s');") %  BoostToSQLite(wl) ;
 		lrtd.s = os.str();
 		phd._complete = false;
 		thread st(LeftRightThread, lrtd);
@@ -710,8 +710,10 @@ LRESULT CMainFrame::OnSettings(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 {
 	SettingsCtrl ctrl;
 	ctrl._Refresh = to_string(logger._Refresh);
+	//ctrl.rtd=logger.rtds;
 	ctrl.DoModal();
 	logger._Refresh = stoi(ctrl._Refresh);
+	
 	return 0;
 }
 //doesn't behave quite right when no results leaves last query on screen but doesn't redraw it.

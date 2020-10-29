@@ -69,8 +69,8 @@ public:
 		std::string file;
 	GetModulePath(file);
 	file.append("PHTrace.txt");
-	os<<"\nError logging to: "<<file;
-	os<< boost::format("SQLite : %s\nWindows Template Library : %h\nBoost C++ (datetime) : %s\nBuilt : %s\nMicrosoft Visual C++ : %d\nError logging to: %s") % SQLITE_VERSION % _WTL_VER % BOOST_LIB_VERSION % (std::string(__DATE__) + " " +std::string( __TIME__)) % _MSC_VER % file;
+	//os<<"\nError logging to: "<<file;
+	os<< boost::format("SQLite : %s\nWindows Template Library : %x\nProcess Hacker Library : \nC++17/Boost C++ (datetime) : %s\nBuilt : %s\nMicrosoft Visual C++ : %d\nError logging to: %s") % SQLITE_VERSION % _WTL_VER % BOOST_LIB_VERSION % (std::string(__DATE__) + " " +std::string( __TIME__)) % _MSC_VER % file;
 	SetDlgItemText(IDC_ABOUT_TEXT,os.str().c_str());
 		return TRUE;
 	}

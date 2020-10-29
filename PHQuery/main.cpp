@@ -47,9 +47,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	//phd._WinLeft=second_clock::local_time();
 	ProcessHackerStart(hInstance);
 	logger._Refresh = 1000;
-	//if (lpstrCmdLine!=NULL) TODO 2020 do this via gui settings
-	//	logger._Refresh = boost::lexical_cast<int>(string(lpstrCmdLine));
-	//logger._Refresh = 500;
 
 	hRes = _Module.Init(NULL, hInstance);
 	ATLASSERT(SUCCEEDED(hRes));

@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 #include <string>
-//#include "..\phshared\phshared.h"
+//control the refresh rate
 
 class SettingsCtrl : public CDialogImpl<SettingsCtrl>
 {
@@ -15,14 +15,14 @@ public:
 	END_MSG_MAP()
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
-
+		SetDlgItemText(IDC_REFRESH,_Refresh.c_str() );
 
 		return TRUE;
 	}
 	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{		
 		char q[100];
-		int ql = ::GetWindowTextLength(GetDlgItem(IDC_REFRESH));
+		int ql = ::GetWindowTextLength(GetDlgItem(IDC_REFRESH));//todo warn if less than refresh timing or display 
 		GetDlgItemText(IDC_REFRESH, q,ql+1);
 		_Refresh = std::string(q);
 		EndDialog(wID);

@@ -152,8 +152,8 @@ extern map<HANDLE, CProcessInfo> process_map;
 		 return;
 	 ostringstream clSQL;
 	 clSQL.str("");
-	 clSQL << boost::format("INSERT INTO Process(CreationTime,PathID,CLID,UserID,Destruction,ParentID VALUES (JULIANDAY('%s'),%d,%d,%d,JULIANDAY('%s'),%d") % GetStartTime() % PathID % getclid(_commandline) % _UserID % BoostToSQLite(ExitTime) % GetParentID();
-	 
+	 clSQL << boost::format("INSERT INTO Process(CreationTime,PathID,CLID,UserID,Destruction) VALUES (JULIANDAY('%s'),%d,%d,%d,JULIANDAY('%s'));") % GetStartTime() % PathID % getclid(_commandline) % _UserID % BoostToSQLite(ExitTime) ;
+	 //,ParentID,%d% GetParentID()
 	 
 
 

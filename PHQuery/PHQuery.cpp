@@ -4,13 +4,7 @@
 #include <sstream>
 #include "query.h"
 #include "screen.h"
-//#if defined (_WIN64)
 #include <mutex>
-/*#else
-#include "boost\thread\mutex.hpp"
-#include <boost\thread\lock_guard.hpp> 
-using namespace boost;
-#endif*/
 
 using namespace boost::posix_time;
 using namespace std;

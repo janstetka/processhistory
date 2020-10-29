@@ -335,7 +335,7 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 		return 0;
 	}
 
-	bool /*CMainFrame::*/FilterUser()
+	bool FilterUser()
 	{
 		//char User[300];
 		//int length = GetCurrentSel(ph_instance._hWndCombo3);
@@ -358,7 +358,7 @@ LRESULT CMainFrame::CopyDetailsToClipboard(WORD /*wNotifyCode*/, WORD /*wID*/, H
 	}
 
 	set<string> PathSet;
-	bool /*CMainFrame::*/FilterExec()
+	bool FilterExec()
 	{
 		char Path[300];
 		int length = GetWindowTextLength(ph_instance._hWndCombo2);

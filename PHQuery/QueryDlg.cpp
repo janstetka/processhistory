@@ -5,12 +5,8 @@
 #include "screen.h"
 #include "query.h"
 #include "..\ProcessHistory\PHScroll.h"
-//#if defined (_WIN64)
 #include <thread>
-/*#else
-#include "boost\thread\thread.hpp"
-using namespace boost;
-#endif*/
+
 #include "..\phshared\phshared.h"
 //#include <mutex>
 
