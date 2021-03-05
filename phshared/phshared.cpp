@@ -36,7 +36,7 @@ void DBError(const char * err,int line,string errfile){	PHTrace(err,line,errfile
 
 string dbPath;
 
-sqlite3* OpenDB()
+extern "C" sqlite3* OpenDB()
 {
 	sqlite3 *db;
 //	char * szErr;

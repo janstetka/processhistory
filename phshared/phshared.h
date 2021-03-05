@@ -6,7 +6,7 @@
 #include <string>
 #include "boost/date_time/posix_time/posix_time.hpp"
 
-sqlite3* OpenDB();
+extern "C" sqlite3* OpenDB();
 void DBError(const char * err,int line,std::string file);
 std::string Win32Error();
 //void GetProcessUser(HANDLE hProcess,std::string &);//win32
