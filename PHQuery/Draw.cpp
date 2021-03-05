@@ -101,11 +101,11 @@ void PHScroll::DrawProcess(long lID, RECT rcEvent)
 		
 		DrawLines(_MemDC->m_hDC, rcEvent, lID);
 			
-		map<long,int>::iterator line_it=phq._Lines.find(lID);
+		/*map<long,int>::iterator line_it=phq._Lines.find(lID);
 
 		POINT pt;
 		pt.x=rcEvent.left + 10;
-		pt.y=(line_it->second*40)-20;
+		pt.y=(line_it->second*40)-20; TODO reinstate if causes problems*/
 		map<long, long>::iterator crc_it=phq._PData.find(lID);
 		map<long,string>::iterator image_it;
 		if(crc_it!=phq._PData.end())
