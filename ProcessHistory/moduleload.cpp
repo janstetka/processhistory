@@ -6,7 +6,7 @@
 using namespace std;
 using namespace boost::algorithm;
 
-extern map<string, sqlite3_int64> PHPaths;
+extern unordered_map<string, sqlite3_int64> PHPaths;
 //boost::mutex paths_mtx,cl_mtx;
 extern mutex db_mutex;
 
@@ -18,7 +18,7 @@ sqlite3_int64 GetPathID(string path)
 	{
 		c = tolower(c);
 	}
-	map<string, sqlite3_int64>::iterator path_it=PHPaths.find(path);
+	unordered_map<string, sqlite3_int64>::iterator path_it=PHPaths.find(path);
 	sqlite3_int64 PathID=-1;
 
 	if(path_it==PHPaths.end())
@@ -55,14 +55,14 @@ sqlite3_int64 GetPathID(string path)
 	return PathID;
 }
 
-map<string, sqlite3_int64> PHCLs;
+unordered_map<string, sqlite3_int64> PHCLs;
 
 sqlite3_int64 getclid(string cl)
 {
 	
 	//boost::mutex::scoped_lock psl(cl_mtx);
 	to_lower(cl);
-	map<string, sqlite3_int64>::iterator path_it=PHCLs.find(cl);
+	unordered_map<string, sqlite3_int64>::iterator path_it=PHCLs.find(cl);
 	sqlite3_int64 PathID=-1;
 
 	if (path_it == PHCLs.end())// if not in memory check disk

@@ -90,7 +90,7 @@
     <ClCompile Include="..\sqlite\sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\PHLogger\DBTables.cpp">
+    <ClCompile Include="..\PHLogger\DBTables.c">
       <Filter>Source Files\background</Filter>
     </ClCompile>
   </ItemGroup>
@@ -126,6 +126,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Drilldown.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PHLogger\library.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

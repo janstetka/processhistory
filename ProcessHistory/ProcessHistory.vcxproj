@@ -199,7 +199,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\background\phrefresh.cpp" />
-    <ClCompile Include="..\PHLogger\DBTables.cpp" />
+    <ClCompile Include="..\PHLogger\DBTables.c" />
     <ClCompile Include="..\PHLogger\log.cpp" />
     <ClCompile Include="..\PHLogger\PHLogUser.cpp" />
     <ClCompile Include="..\PHLogger\ProcessInfo.cpp" />
@@ -219,6 +219,7 @@
     <ClCompile Include="PHTimeInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\PHLogger\library.h" />
     <ClInclude Include="..\PHQuery\AboutDlg.h" />
     <ClInclude Include="..\PHQuery\PH.h" />
     <ClInclude Include="..\phshared\phshared.h" />
