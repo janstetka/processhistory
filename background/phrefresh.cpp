@@ -1,4 +1,4 @@
-#include <map>
+#include <unordered_map>
 #include <set>
 #include "..\phlogger\ProcessInfo.h"
 
@@ -16,7 +16,7 @@ using namespace std;
 using namespace boost::posix_time;
 
 extern CPHLogger logger;
-extern map<HANDLE,CProcessInfo> process_map;
+extern unordered_map<HANDLE,CProcessInfo> process_map;
 extern PH ph_instance;
 void WorkerThread();
 	
