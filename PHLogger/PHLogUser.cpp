@@ -1,5 +1,5 @@
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "..\phshared\phshared.h"
 #include "PHLogUser.h"
 //#include <boost/thread/mutex.hpp>
@@ -7,7 +7,7 @@
 using namespace std;
 //using namespace boost;
 
-map<string, sqlite3_int64> g_clUser;
+unordered_map<string, sqlite3_int64> g_clUser;
 //extern mutex db_mutex;
 //mutex user_mtx;
 
@@ -15,7 +15,7 @@ map<string, sqlite3_int64> g_clUser;
 sqlite3_int64 GetUserID(string clUserName)
 {
 	//mutex::scoped_lock sl(user_mtx);
-	map<string, sqlite3_int64>::iterator it;
+	unordered_map<string, sqlite3_int64>::iterator it;
 	it=g_clUser.find(clUserName);
 	if (it == g_clUser.end())
 		 return CreateUser(clUserName);

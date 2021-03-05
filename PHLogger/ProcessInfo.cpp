@@ -121,7 +121,7 @@ bool CProcessInfo::Validate()	{	return _bValid;	}
 
 extern sqlite3_int64 getclid(string cl);
 
-extern map<HANDLE, CProcessInfo> process_map;
+extern unordered_map<HANDLE, CProcessInfo> process_map;
 
  sqlite3_int64 CProcessInfo::GetParentID() // will only work if parent process has ended
 {
@@ -129,7 +129,7 @@ extern map<HANDLE, CProcessInfo> process_map;
 	 // otherwise can display these details at query
 
 	 // will have gathered these details in constructor - need to know which member of map to lookup
-	 map<HANDLE, CProcessInfo>::iterator it=process_map.find(ParentPID);
+	 unordered_map<HANDLE, CProcessInfo>::iterator it=process_map.find(ParentPID);
 	 if (it != process_map.end())
 	 {
 		 // lookup whether have already saved

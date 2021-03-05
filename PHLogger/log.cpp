@@ -14,7 +14,7 @@ using namespace boost::date_time;
 /*fine grain threading*/
 
 extern CPHLogger logger;
-map<HANDLE,CProcessInfo> process_map;
+unordered_map<HANDLE,CProcessInfo> process_map;
 
 mutex db_mutex;
 extern mutex start_mtx, stop_mtx;
@@ -159,9 +159,10 @@ public:
 			// [review use of boost - has anything else used become standard? lexical cast, filesystem etc.
 			// anything else modern c++ e.g. iterators now range - only in bits of code that are core]
 			// ++don't do mouseover
-			// ++is it possible to stop using nowide
-			//perf - keep db open /minimum open calls
+			// ++perf is it possible to stop using nowide -  in c (as both sqlite and phacker in c) for user, path and command line -https://www.boost.org/doc/libs/develop/libs/nowide/doc/html/index.html
+			//++perf - keep db open /minimum open calls
 			//++notify (consolidate- LRThread, context worker & worker ) single thread rather than create new - better control - gui waits for start events to be logged. notify a wait that waits if enumeration or start events are busy
+			// ++check using correct containers, don't need to be ordered if mainly used for lookup. Any other std lib alogorithms taken for granted that may not be optimal? used alot in gui
 		}
 		catch(...)
 		{
@@ -222,7 +223,7 @@ void CPHLogger ::StopEvent(HANDLE lPID)
 	it will have been saved when PH started (See above)*/
 	
 		//dp.WriteEnd(Creation);	writing everything on process end
-		map<HANDLE,CProcessInfo>::iterator pi=process_map.find(lPID);
+		unordered_map<HANDLE,CProcessInfo>::iterator pi=process_map.find(lPID);
 		if(pi!=process_map.end())
 		{
 			pi->second.SaveProcess(dp._Exit,false);

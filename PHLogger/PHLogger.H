@@ -52,7 +52,7 @@ public:
 	sqlite3 * procdb;
 };
 
-void CreateTables();
+//void CreateTables();
 void StartEv(long p);
 sqlite3_int64 GetPathID(std::string path);
 void StartBackground();

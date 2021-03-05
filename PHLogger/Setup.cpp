@@ -2,12 +2,14 @@
 #include "PHLogUser.h"
 #include "..\phshared\phshared.h"
 #include <thread>
+#include "library.h"
 
 using namespace std;
 
 map<string, sqlite3_int64> PHPaths;
 
 //void LoadPathData();
+//extern void CreateTables();
 
 void CPHLogger::StartProcessHistory()
 {	
