@@ -1,0 +1,62 @@
+design principles
+
+c where possible eg. where only concerned with libraries that are c i.e. both sqlite and phacker in c i.e. path and command line store in db in c
+boost where needed (date time) otherwise std c++ -  explicitly limit with not using whole namespace? bcp https://www.boost.org/doc/libs/1_74_0/doc/html/date_time/details.html#other_boost_libs - string algo and lexical cast included so ok to use those
+polling is better than events - no com i.e. WMI, no drivers event based proven unreliable
+python like syntax where possibe i.e. for loops and string handling
+controlled multithreading i.e. condition variables with minimum of threads
+WTL for GUI e.g. setings dialog validation - outsource code to library applies elsewhere too
+SQLite for DB
+process hacker for library
+any auto operation that requires a progress bar is excessive
+use upto C++20
+don't expect admin privelege
+profile / performance monitor memory, disk & cpu
+reduce code duplication
+minimum compiler warnings
+used best agorithm for purpose in std libray e.g. unordered_map (hash) 
+often ordering is more efficient (in other problems)
+
+
+Logger- more lookups than insertions
+
+unordered_map<string, sqlite3_int64> g_clUser; 
+extern unordered_map<string, sqlite3_int64> PHPaths;
+unordered_map<string, sqlite3_int64> PHCLs;
+
+Do these need to be ordered? Yes set_difference requires it
+	set<HANDLE> OldProcesses;
+				set<HANDLE> Processes;
+set<HANDLE> result;
+
+GUI - some looked up once for draw, some looked >1 when clicked - generally need to combine maps so less containers when based on same thing i.e. process id and perhaps have seperate iterative containers
+
+screen.h
+std::map<long,RECT> _ProcessAreas; - 1 lookup of old but otherwise all iteration - rewrite with container more suited to iteration vector?
+
+all the following could be unordered but bear in mind ^^ (gui)
+
+std::map<long,HICON> icons - no iteration, 2x lookup, once for draw, once to check if already present as this collection grows over lifetime so good candidate for unordered
+std::set<long> _clipped_left,_clipped_right - no iteration, 1x lookup each - cleared on each query probably not candidate
+std::map<long,std::string> _EXEImages - no iteration, 2x lookup - never cleared so maybe candidate
+std::map<long,std::string> qrypaths; - no iteration,5 lookups, used interactively but once for draw possible candidate, cleared each query
+why not  one of _EXEImages,qrypaths?
+why not combine in struct with icon?
+same as PHPaths from logger?
+
+Query.h
+
+leave as is? given iteration:
+	std::map<long,PHProcess> _Processes; 1 iteration 3x find, processareas(missed) and qrypaths all based on db process ID - could combine?
+	could be unordered? where lookup>insert:
+	std::map<long,int> _Lines; no iteration,2x lookup - 1 uneccesary? presumably process id to line again why separate container?
+	std::map<long,long> _PData; no iteration 1 looksup
+	
+		std::list<PHProcess> process_list;
+		
+		wtl
+		set<string> PathSet; 1x lookup no iteration
+
+
+
+
